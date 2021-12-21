@@ -2,4 +2,131 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
 
+    <changeSet id="createRolesTable" author="Anton Turchenko">
+        <createTable tableName="role">
+            <column name="Id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="Name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createUserTable" author="Anton Turchenko">
+        <createTable tableName="user">
+            <column name="Id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="Role" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="Email" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="addConstraintsForUserTable" author="Anton Turchenko">
+        <addForeignKeyConstraint baseTableName="user" baseColumnNames="Role" constraintName="fk_user_role"
+                                 referencedTableName="role" referencedColumnNames="Id"/>
+    </changeSet>
+
+    <changeSet id="createDoctorSpecializationTable" author="Anton Turchenko">
+        <createTable tableName="doctor_specialization">
+            <column name="Id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="Name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createDoctorTable" author="Anton Turchenko">
+        <createTable tableName="doctor">
+            <column name="Id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="User" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Specialization" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="addConstraintsForDoctorTable" author="Anton Turchenko">
+        <addForeignKeyConstraint baseTableName="doctor" baseColumnNames="User" constraintName="fk_doctor_user"
+                                 referencedTableName="user" referencedColumnNames="Id"/>
+        <addForeignKeyConstraint baseTableName="doctor" baseColumnNames="Specialization" constraintName="fk_doctor_specialization"
+                                 referencedTableName="doctor_specialization" referencedColumnNames="Id"/>
+    </changeSet>
+
+    <changeSet id="createPetTypeTable" author="Anton Turchenko">
+        <createTable tableName="pet_type">
+            <column name="Id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="Name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createPetTable" author="Anton Turchenko">
+        <createTable tableName="pet">
+            <column name="Id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="Name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Type" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Owner" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="addConstraintsToPetTable" author="Anton Turchenko">
+        <addForeignKeyConstraint baseTableName="pet" baseColumnNames="Type" constraintName="fk_pet_pet_type"
+                                 referencedTableName="pet_type" referencedColumnNames="Id"/>
+        <addForeignKeyConstraint baseTableName="pet" baseColumnNames="Owner" constraintName="fk_pet_user"
+                                 referencedTableName="user" referencedColumnNames="Id"/>
+    </changeSet>
+
+    <changeSet id="createIssueTable" author="Anton Turchenko">
+        <createTable tableName="issue">
+            <column name="Id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="Doctor" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="Pet" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="Description" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="addConstraintsToIssueTable" author="Anton Turchenko">
+        <addForeignKeyConstraint baseTableName="issue" baseColumnNames="Doctor" constraintName="fk_issue_doctor"
+                                 referencedTableName="doctor" referencedColumnNames="Id"/>
+        <addForeignKeyConstraint baseTableName="issue" baseColumnNames="Pet" constraintName="fk_issue_pet"
+                                 referencedTableName="pet" referencedColumnNames="Id"/>
+    </changeSet>
+
+    <changeSet id="fillBaseWithTestData" author="Anton Turchenko">
+        <sqlFile dbms="mysql" path="db/data/test_data.sql" />
+    </changeSet>
 </databaseChangeLog>
