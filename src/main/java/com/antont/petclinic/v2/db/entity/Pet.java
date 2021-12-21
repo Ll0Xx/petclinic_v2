@@ -1,6 +1,6 @@
-package com.antont.petclinic.v2.entity;
+package com.antont.petclinic.v2.db.entity;
 
-import com.antont.petclinic.v2.entity.base.NameEntity;
+import com.antont.petclinic.v2.db.entity.base.NameEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;

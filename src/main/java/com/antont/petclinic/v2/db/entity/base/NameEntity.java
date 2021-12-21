@@ -1,4 +1,4 @@
-package com.antont.petclinic.v2.entity.base;
+package com.antont.petclinic.v2.db.entity.base;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
