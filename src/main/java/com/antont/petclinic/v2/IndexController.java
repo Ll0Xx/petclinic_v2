@@ -1,14 +1,22 @@
 package com.antont.petclinic.v2;
 
+import com.antont.petclinic.v2.db.PetService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 public class IndexController {
 
-    @GetMapping(path = "/yay")
-    public String get(@RequestParam(name = "a") String a){
-        return "yay: " + a;
+    private final PetService petService;
+
+    public IndexController(PetService petService) {
+        this.petService = petService;
+    }
+
+    @GetMapping(path = "/")
+    public String get(Model model){
+        model.addAttribute("pets", petService.getPets());
+        return "index";
     }
 }
