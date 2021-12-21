@@ -3,7 +3,7 @@ package com.antont.petclinic.v2.db.entity.base;
 import javax.persistence.*;
 import java.math.BigInteger;
 
-@Entity
+@MappedSuperclass
 public class IdEntity {
     @Id
     @Column(name = "Id")

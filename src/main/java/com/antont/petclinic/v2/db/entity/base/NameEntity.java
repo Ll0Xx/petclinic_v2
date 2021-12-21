@@ -2,8 +2,9 @@ package com.antont.petclinic.v2.db.entity.base;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 
-@Entity
+@MappedSuperclass
 public class NameEntity extends IdEntity{
 
     @Column(name = "Name")
