@@ -1,4 +1,4 @@
-package com.antont.petclinic_v2;
+package com.antont.petclinic.v2;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

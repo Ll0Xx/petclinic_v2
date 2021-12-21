@@ -1,4 +1,4 @@
-package com.antont.petclinic_v2.security;
+package com.antont.petclinic.v2.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
