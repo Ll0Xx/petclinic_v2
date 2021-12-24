@@ -7,7 +7,7 @@ import java.math.BigInteger;
 public class IdEntity {
     @Id
     @Column(name = "Id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
 
     public BigInteger getId() {
