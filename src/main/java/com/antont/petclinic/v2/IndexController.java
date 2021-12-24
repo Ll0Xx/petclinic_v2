@@ -1,6 +1,6 @@
 package com.antont.petclinic.v2;
 
-import com.antont.petclinic.v2.db.PetService;
+import com.antont.petclinic.v2.service.DoctorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class IndexController {
 
-    private final PetService petService;
+    private final DoctorService doctorService;
 
-    public IndexController(PetService petService) {
-        this.petService = petService;
+    public IndexController(DoctorService doctorService) {
+        this.doctorService = doctorService;
     }
 
     @GetMapping(path = "/")
     public String get(Model model){
-        model.addAttribute("pets", petService.getPets());
+        model.addAttribute("doctors", doctorService.getFirst10Doctors());
         return "index";
     }
 }

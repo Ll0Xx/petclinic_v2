@@ -1,4 +1,4 @@
-package com.antont.petclinic.v2.db;
+package com.antont.petclinic.v2.service;
 
 import com.antont.petclinic.v2.db.entity.Pet;
 import com.antont.petclinic.v2.db.repository.PetRepository;
