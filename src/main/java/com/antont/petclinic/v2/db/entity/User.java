@@ -15,7 +15,7 @@ public class User extends IdEntity {
     private Role role;
 
     @Column(name = "Email")
-    private String Email;
+    private String email;
 
     @Column(name = "Password")
     private String password;
@@ -29,11 +29,11 @@ public class User extends IdEntity {
     }
 
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     public void setEmail(String email) {
-        Email = email;
+        this.email = email;
     }
 
     public String getPassword() {

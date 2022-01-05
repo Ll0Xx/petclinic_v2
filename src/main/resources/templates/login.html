@@ -29,21 +29,17 @@
 <!-- Tabs content -->
 <div class="d-grid gap-2 col-3 mt-3  mx-auto tab-content" style="margin-top: 3rem" id="tabs-content">
     <div class="tab-pane mt-5 fade show active" id="tabs-tabs-1" role="tabpanel" aria-labelledby="tabs-tab-1">
-        <form th:action="@{/auth}">
+        <form th:action="@{/perform_login}" method="post">
             <p class="fs-3 text-center">Please login to your account</p>
 
             <div class="form-floating mb-3">
-                <input type="email" class="form-control" id="floatingInput" placeholder="Email" required>
+                <input type="email" name="username" class="form-control" id="floatingInput" placeholder="Email">
                 <label for="floatingInput">email@example.com</label>
-                <p th:each="error: ${#fields.errors('email')}"
-                   th:text="${error}">Validation error</p>
             </div>
 
             <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="floatingPassword" placeholder="Password" required>
+                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
                 <label for="floatingPassword">Password</label>
-                <p th:each="error: ${#fields.errors('password')}"
-                   th:text="${error}">Validation error</p>
             </div>
 
             <div class="d-grid gap-2">
@@ -53,29 +49,24 @@
         </form>
     </div>
         <div class="tab-pane mt-5 fade" id="tabs-tabs-2" role="tabpanel" aria-labelledby="tabs-tab-2">
-            <form th:action="@{/create-account}">
+            <form th:action="@{/process_register}" th:object="${createUserDto}" method="post">
                 <p class="fs-3 text-center">Create new account</p>
 
                 <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="sign-up-email" placeholder="Email" required>
+                    <input type="email" class="form-control" id="sign-up-email" th:field="*{email}" placeholder="Email">
                     <label for="sign-up-email">email@example.com</label>
-                    <p th:each="error: ${#fields.errors('email')}"
-                       th:text="${error}">Validation error</p>
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="sign-up-password" placeholder="Password" required>
+                    <input type="password" class="form-control" id="sign-up-password" th:field="*{password}"
+                           placeholder="Password">
                     <label for="sign-up-password">Password</label>
-                    <p th:each="error: ${#fields.errors('password')}"
-                       th:text="${error}">Validation error</p>
                 </div>
 
                 <div class="form-floating mb-3">
                     <input type="password" class="form-control" id="sign-up-confirm-password"
-                           placeholder="Confirm password" required>
+                           th:field="*{confirmPassword}" placeholder="Confirm password">
                     <label for="sign-up-confirm-password">Confirm password</label>
-                    <p th:each="error: ${#fields.errors('confirmPassword')}"
-                       th:text="${error}">Validation error</p>
                 </div>
 
                 <div class="d-grid gap-2">
