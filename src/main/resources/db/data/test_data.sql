@@ -9,9 +9,9 @@ INSERT INTO `pet_type` (`Id`, `Name`) VALUES ('8', 'ferret');
 INSERT INTO `pet_type` (`Id`, `Name`) VALUES ('9', 'insect');
 
 
-INSERT INTO `role` (`Id`, `Name`) VALUES ('1', 'ADMIN');
-INSERT INTO `role` (`Id`, `Name`) VALUES ('2', 'DOCTOR');
-INSERT INTO `role` (`Id`, `Name`) VALUES ('3', 'ADMIN');
+INSERT INTO `role` (`Id`, `Name`) VALUES ('1', 'ROLE_ADMIN');
+INSERT INTO `role` (`Id`, `Name`) VALUES ('2', 'ROLE_DOCTOR');
+INSERT INTO `role` (`Id`, `Name`) VALUES ('3', 'ROLE_USER');
 
 
 INSERT INTO `doctor_specialization` (`Id`, `Name`) VALUES ('1', 'Anesthesia');
