@@ -45,7 +45,7 @@ public class AuthController {
 
         userRepository.save(user);
 
-        return "redirect:/login";
+        return "redirect:/login?tab=1";
     }
 
     private Optional<Role> getUserRole(){
