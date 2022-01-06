@@ -15,7 +15,7 @@ public class Pet extends NameEntity {
 
     @ManyToOne
     @JoinColumn(name = "Owner")
-    private User owned;
+    private User owner;
 
     public PetType getPetType() {
         return petType;
@@ -25,11 +25,11 @@ public class Pet extends NameEntity {
         this.petType = petType;
     }
 
-    public User getOwned() {
-        return owned;
+    public User getOwner() {
+        return owner;
     }
 
-    public void setOwned(User owned) {
-        this.owned = owned;
+    public void setOwner(User owned) {
+        this.owner = owned;
     }
 }

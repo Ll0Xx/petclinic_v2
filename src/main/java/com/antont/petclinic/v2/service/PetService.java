@@ -1,6 +1,7 @@
 package com.antont.petclinic.v2.service;
 
 import com.antont.petclinic.v2.db.entity.Pet;
+import com.antont.petclinic.v2.db.entity.User;
 import com.antont.petclinic.v2.db.repository.PetRepository;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,11 @@ public class PetService {
                 .collect(Collectors.joining(", "));
     }
 
-    public List<Pet> getPets(){
-         return petRepository.findAll();
+    public List<Pet> getPets() {
+        return petRepository.findAll();
+    }
+
+    public List<Pet> getPetsByOwner(User owner) {
+        return petRepository.findByOwner(owner);
     }
 }

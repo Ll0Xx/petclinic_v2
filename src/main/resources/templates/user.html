@@ -2,13 +2,66 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>My Account</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.1.3/css/bootstrap.min.css} "/>
     <link rel="stylesheet" th:href="@{/css/login.css} "/>
 
 <body>
 <header th:replace="_fragments.html :: header"></header>
-<div> yay user email is: [[${userPrincipal}]]</div>
+<!-- Tabs navs -->
+<ul class="d-flex justify-content-center nav nav-tabs mb-3" id="tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="tabs-tab-1" data-mdb-toggle="tab" href="#tabs-tabs-1" role="tab"
+           aria-controls="tabs-tabs-1" aria-selected="false">
+            My Pets
+        </a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="tabs-tab-2" data-mdb-toggle="tab" href="#tabs-tabs-2" role="tab"
+           aria-controls="tabs-tabs-2" aria-selected="false">
+            My Pet Issues
+        </a>
+    </li>
+</ul>
+<!-- Tabs navs -->
+
+<!-- Tabs content -->
+<div class="tab-content" id="tabs-content">
+    <div class="tab-pane col-6 mx-auto fade show active" id="tabs-tabs-1" role="tabpanel" aria-labelledby="tabs-tab-1">
+        <div th:unless="${pets.isEmpty()}">
+            <div class="text-center my-3">
+                <span> List of your pet, click the button to add more </span>
+                <button class="btn btn-primary">Add Pet</button>
+            </div>
+            <table class="table table-striped">
+                <tr class="fw-bold border-bottom border-dark">
+                    <td>Id</td>
+                    <td>Pet Name</td>
+                    <td>Pet Type</td>
+                </tr>
+                <tr th:each="pet: ${pets}">
+                    <td th:text="${pet.getId()}"></td>
+                    <td th:text="${pet.getName()}"></td>
+                    <td th:text="${pet.getPetType().getName()}"></td>
+                </tr>
+            </table>
+        </div>
+        <div th:if="${pets.isEmpty()}">
+            <div class="text-center">
+                You don't have pets right now, but you can add them by clicking the button below
+            </div>
+            <div class="d-grid gap-2 mt-3">
+                <button class="btn btn-primary mb-3 mx-auto">Add Pet</button>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane mt-5 fade" id="tabs-tabs-2" role="tabpanel" aria-labelledby="tabs-tab-2">
+        <div>
+            there will be a history of issues
+        </div>
+    </div>
+</div>
+<!-- Tabs content -->
 </body>
 
 <script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
