@@ -1,7 +1,8 @@
-package com.antont.petclinic.v2;
+package com.antont.petclinic.v2.controller;
 
 import com.antont.petclinic.v2.db.entity.Pet;
 import com.antont.petclinic.v2.db.entity.User;
+import com.antont.petclinic.v2.dto.PetDto;
 import com.antont.petclinic.v2.service.PetService;
 import com.antont.petclinic.v2.service.UserService;
 import org.springframework.stereotype.Controller;
@@ -24,9 +25,15 @@ public class UserController {
 
     @GetMapping(path = "/user")
     public String get(Model model) {
-        Optional<User> user = userService.getLoggedInUser();
-        List<Pet> pets = petService.getPetsByOwner(user.get());
+        User user = userService.getLoggedInUser();
+        List<Pet> pets = petService.getPetsByOwner(user);
         model.addAttribute("pets", pets);
+
+        if (!model.containsAttribute("pet")) {
+            model.addAttribute("pet", new PetDto());
+        }
+
+        model.addAttribute("petTypes", petService.getPetTypes());
         return "user";
     }
 }

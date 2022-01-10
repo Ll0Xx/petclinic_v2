@@ -51,6 +51,10 @@ test {
     useJUnitPlatform()
 }
 
+bootRun{
+    sourceResources(sourceSets.main)
+}
+
 asciidoctor {
     inputs.dir snippetsDir
     dependsOn test

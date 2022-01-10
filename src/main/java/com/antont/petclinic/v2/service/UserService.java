@@ -5,8 +5,6 @@ import com.antont.petclinic.v2.db.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class UserService {
 
@@ -20,11 +18,13 @@ public class UserService {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
-    public Optional<User> getLoggedInUser() {
+    public User getLoggedInUser() {
         return getByEmail(getCurrentUserEmail());
     }
 
-    public Optional<User> getByEmail(String email){
-        return userRepository.findByEmail(email);
+    public User getByEmail(String email){
+        return userRepository.findByEmail(email).orElseThrow(() -> {
+            throw new RuntimeException(String.format("User with email: %s not found", email));
+        });
     }
 }

@@ -1,4 +1,4 @@
-package com.antont.petclinic.v2.auth;
+package com.antont.petclinic.v2.controller;
 
 import com.antont.petclinic.v2.auth.dto.CreateUserDto;
 import com.antont.petclinic.v2.db.entity.Role;
