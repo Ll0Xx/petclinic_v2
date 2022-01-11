@@ -6,7 +6,9 @@ import com.antont.petclinic.v2.db.entity.User;
 import com.antont.petclinic.v2.db.repository.PetRepository;
 import com.antont.petclinic.v2.db.repository.PetTypeRepository;
 import com.antont.petclinic.v2.dto.PetDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -32,41 +34,53 @@ public class PetService {
                 .collect(Collectors.joining(", "));
     }
 
-    public void savePet(PetDto dto) {
+    public Pet handlePetRequest(PetDto dto) {
+        if (dto.getId() == null) {
+            return savePet(dto);
+        } else {
+            return editPet(dto.getId(), dto);
+        }
+    }
+    
+    private Pet savePet(PetDto dto) {
         User user = userService.getLoggedInUser();
         Pet pet = new Pet();
         pet.setName(dto.getName());
         pet.setOwner(user);
         pet.setPetType(getPetType(dto.getPetType()));
         petRepository.save(pet);
+        return pet;
     }
 
-    public void editPet(BigInteger id, PetDto dto) {
+    private Pet editPet(BigInteger id, PetDto dto) {
         User user = userService.getLoggedInUser();
         Optional<Pet> pet = petRepository.findById(id);
-        pet.ifPresentOrElse(pet1 -> {
-            if (pet1.getOwner() != user) {
+        return pet.map(pet1 -> {
+            if (pet1.getOwner() == user) {
                 pet1.setName(dto.getName());
                 pet1.setPetType(getPetType(dto.getPetType()));
+                petRepository.save(pet1);
+                return pet1;
             } else {
-                throw new RuntimeException("Error while trying to edit pet");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Error while trying to edit pet");
             }
-        }, () -> {
-            throw new RuntimeException("Pet with id: " + id + " not found");
+        }).orElseThrow(() -> {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Pet with id: " + id + " not found");
         });
     }
 
-    public void deletePet(BigInteger id){
+    public BigInteger deletePet(BigInteger id) {
         User user = userService.getLoggedInUser();
         Optional<Pet> pet = petRepository.findById(id);
-        pet.ifPresentOrElse(pet1 -> {
-            if (pet1.getOwner() != user) {
+        return pet.map(pet1 -> {
+            if (pet1.getOwner() == user) {
                 petRepository.delete(pet1);
+                return id;
             } else {
-                throw new RuntimeException("Error while trying to delete pet");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Error while trying to delete pet");
             }
-        }, () -> {
-            throw new RuntimeException("Pet with id: " + id + " not found");
+        }).orElseThrow(() -> {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet with id: " + id + " not found");
         });
     }
 
@@ -76,7 +90,7 @@ public class PetService {
 
     private PetType getPetType(BigInteger id) {
         return petTypeRepository.findById(id).orElseThrow(() -> {
-            throw new RuntimeException("Pet type not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet type with id: " + id + " not found");
         });
     }
 

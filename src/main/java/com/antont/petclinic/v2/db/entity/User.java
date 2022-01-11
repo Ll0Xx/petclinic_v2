@@ -1,6 +1,7 @@
 package com.antont.petclinic.v2.db.entity;
 
 import com.antont.petclinic.v2.db.entity.base.IdEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import javax.persistence.ManyToOne;
 @Entity(name = "user")
 public class User extends IdEntity {
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "role")
     private Role role;
@@ -17,6 +19,7 @@ public class User extends IdEntity {
     @Column(name = "Email")
     private String email;
 
+    @JsonIgnore
     @Column(name = "Password")
     private String password;
 
