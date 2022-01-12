@@ -39,24 +39,18 @@ $(document).ready(function () {
             console.error(e);
         }
     })
+})
 
-    $("#confirmModal").on("click",".btn-default", function(){
-        // code
-    });
-
-    function updatePetTable(pet) {
-        const $row = $("#petsTable tr td").filter(function () {
-            return $(this).text() == pet.id;
-        }).parent();
-        if ($row.length <= 0) {
-            const $table = $('#petsTable tbody');
-            if ($table.children().length <= 1) {
-                console.log('toggle classes')
-                $('#petsListContainer').toggleClass('d-none');
-                $('#noPetsMessageContainer').toggleClass('d-none');
-            }
-            $table.append(
-                `<tr>
+function updatePetTable(pet) {
+    const $row = getRow(pet.id);
+    if ($row.length <= 0) {
+        const $table = $('#petsTable tbody');
+        if ($table.children().length <= 1) {
+            $('#petsListContainer').removeClass('d-none');
+            $('#noPetsMessageContainer').addClass('d-none');
+        }
+        $table.append(
+            `<tr>
                     <td class="pet-id">${pet.id}</td>
                     <td class="pet-name">${pet.name}</td>
                     <td class="pet-type">${pet.petType.name}</td>
@@ -71,24 +65,24 @@ $(document).ready(function () {
                         </button>
                     </td>
                 </tr>`
-            )
-        } else {
-            $row.find('.pet-name').text(pet.name);
-            $row.find('.pet-type').text(pet.petType.name);
-            $row.find('.btn-primary').attr('data-bs-name', pet.name);
-            $row.find('.btn-primary').attr('data-bs-type', pet.petType.id);
-        }
+        )
+    } else {
+        $row.find('.pet-name').text(pet.name);
+        $row.find('.pet-type').text(pet.petType.name);
+        $row.find('.btn-primary').attr('data-bs-name', pet.name);
+        $row.find('.btn-primary').attr('data-bs-type', pet.petType.id);
     }
-})
+}
 
 function deletePet(id) {
-    if (confirm('Are you sure you want to save this thing into the database?')) {
+    if (confirm('Do you want to remove this pet from the database??')) {
         try {
             $.ajax({
                 url: `user/pet/delete/${id}`,
                 type: 'delete',
                 success: function (response) {
                     console.log('item deleted', response);
+                    deleteRow(response)
                 },
                 error: function (response) {
                     console.error(response);
@@ -98,4 +92,20 @@ function deletePet(id) {
             console.error(e);
         }
     }
+}
+
+function deleteRow(id){
+    const $row = getRow(id);
+    $row.remove();
+    const $table = $('#petsTable tbody');
+    if ($table.children().length <= 0) {
+        $('#petsListContainer').addClass('d-none');
+        $('#noPetsMessageContainer').removeClass('d-none');
+    }
+}
+
+function getRow(id){
+    return $("#petsTable tr td").filter(function () {
+        return $(this).text() == id;
+    }).parent();
 }

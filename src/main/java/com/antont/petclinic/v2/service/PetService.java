@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,11 +36,7 @@ public class PetService {
     }
 
     public Pet handlePetRequest(PetDto dto) {
-        if (dto.getId() == null) {
-            return savePet(dto);
-        } else {
-            return editPet(dto.getId(), dto);
-        }
+        return dto.getId() == null ? savePet(dto) : editPet(dto);
     }
     
     private Pet savePet(PetDto dto) {
@@ -52,36 +49,27 @@ public class PetService {
         return pet;
     }
 
-    private Pet editPet(BigInteger id, PetDto dto) {
+    private Pet findPetByIdForCurrentUser(BigInteger id, Consumer<Pet> petConsumer){
         User user = userService.getLoggedInUser();
-        Optional<Pet> pet = petRepository.findById(id);
+        Optional<Pet> pet = petRepository.findByIdAndOwner(id, user);
         return pet.map(pet1 -> {
-            if (pet1.getOwner() == user) {
-                pet1.setName(dto.getName());
-                pet1.setPetType(getPetType(dto.getPetType()));
-                petRepository.save(pet1);
-                return pet1;
-            } else {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Error while trying to edit pet");
-            }
+            petConsumer.accept(pet1);
+            return pet1;
         }).orElseThrow(() -> {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Pet with id: " + id + " not found");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to modify/delete pet");
+        });
+    }
+
+    private Pet editPet(PetDto dto) {
+        return findPetByIdForCurrentUser(dto.getId(), pet -> {
+            pet.setName(dto.getName());
+            pet.setPetType(getPetType(dto.getPetType()));
+            petRepository.save(pet);
         });
     }
 
     public BigInteger deletePet(BigInteger id) {
-        User user = userService.getLoggedInUser();
-        Optional<Pet> pet = petRepository.findById(id);
-        return pet.map(pet1 -> {
-            if (pet1.getOwner() == user) {
-                petRepository.delete(pet1);
-                return id;
-            } else {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Error while trying to delete pet");
-            }
-        }).orElseThrow(() -> {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet with id: " + id + " not found");
-        });
+        return findPetByIdForCurrentUser(id, petRepository::delete).getId();
     }
 
     public List<PetType> getPetTypes(){
