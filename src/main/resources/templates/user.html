@@ -69,15 +69,36 @@
                 You don't have pets right now, but you can add them by clicking the button below
             </div>
             <div class="d-grid gap-2 mt-3">
-                <button type="button" class="btn btn-primary mb-3 mx-auto"  data-bs-toggle="modal" data-bs-target="#petModal">
+                <button type="button" class="btn btn-primary mb-3 mx-auto" data-bs-toggle="modal"
+                        data-bs-target="#petModal">
                     Add Pet
                 </button>
             </div>
         </div>
     </div>
-    <div class="tab-pane mt-5 fade" id="tabs-tabs-2" role="tabpanel" aria-labelledby="tabs-tab-2">
-        <div>
-            there will be a history of issues
+    <div class="tab-pane col-10 mx-auto fade" id="tabs-tabs-2" role="tabpanel" aria-labelledby="tabs-tab-2">
+        <table th:unless="${issues.isEmpty()}" class="table table-striped">
+            <thead>
+            <tr class="fw-bold">
+                <td>Id</td>
+                <td>Doctor</td>
+                <td>Doctor specialization</td>
+                <td>Pet name</td>
+                <td>Issue description</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="issue: ${issues}">
+                <td th:text="${issue.getId()}"></td>
+                <td th:text="${issue.getDoctor().getUser().getEmail()}"></td>
+                <td th:text="${issue.getDoctor().getDoctorSpecialization().getName()}"></td>
+                <td th:text="${issue.getPet().getName()}"></td>
+                <td th:text="${issue.getDescription()}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <div th:if="${issues.isEmpty()}" class="text-center mt-5">
+            You don't have a history of pet issues yet.
         </div>
     </div>
 </div>
