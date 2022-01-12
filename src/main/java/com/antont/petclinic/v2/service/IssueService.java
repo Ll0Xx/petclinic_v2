@@ -1,0 +1,78 @@
+package com.antont.petclinic.v2.service;
+
+import com.antont.petclinic.v2.db.entity.Issue;
+import com.antont.petclinic.v2.db.entity.User;
+import com.antont.petclinic.v2.db.repository.DoctorRepository;
+import com.antont.petclinic.v2.db.repository.IssueRepository;
+import com.antont.petclinic.v2.db.repository.PetRepository;
+import com.antont.petclinic.v2.dto.IssueDto;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class IssueService {
+
+    private final UserService userService;
+    private final DoctorRepository doctorRepository;
+    private final IssueRepository issueRepository;
+    private final PetRepository petRepository;
+
+    public IssueService(UserService userService, DoctorRepository doctorRepository, IssueRepository issueRepository,
+                        PetRepository petRepository) {
+        this.userService = userService;
+        this.doctorRepository = doctorRepository;
+        this.issueRepository = issueRepository;
+        this.petRepository = petRepository;
+    }
+
+    public List<Issue> getIssues(User user){
+        return issueRepository.findByPetOwner(user);
+    }
+
+    public Issue handlePetRequest(IssueDto dto) {
+        return dto.getPet() == null ? create(dto) : update(dto);
+    }
+
+    private Issue create(IssueDto dto) {
+        Issue issue = new Issue();
+        doctorRepository.findById(dto.getDoctor()).ifPresentOrElse(issue::setDoctor, () -> {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to create pet issue");
+        });
+        petRepository.findById(dto.getId()).ifPresentOrElse(issue::setPet, () -> {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to create pet issue");
+        });
+        issue.setDescription(dto.getDescription());
+        issueRepository.save(issue);
+        return issue;
+    }
+
+    private Issue update(IssueDto dto) {
+        Optional<Issue> issue = issueRepository.findById(dto.getId());
+        return issue.map(issue1 -> {
+            if (!issue1.getPet().getId().equals(dto.getPet())) {
+                petRepository.findById(dto.getPet()).ifPresent(issue1::setPet);
+            }
+            if (!issue1.getDoctor().getId().equals(dto.getDoctor())) {
+                doctorRepository.findById(dto.getDoctor()).ifPresent(issue1::setDoctor);
+            }
+            issue1.setDescription(dto.getDescription());
+            return issueRepository.save(issue1);
+        }).orElseThrow(() -> {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to modify pet issue");
+        });
+    }
+
+    public BigInteger delete(BigInteger id) {
+        return issueRepository.findById(id).map(issue -> {
+            issueRepository.delete(issue);
+            return issue.getId();
+        }).orElseThrow(() -> {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to delete pet issue");
+        });
+    }
+}

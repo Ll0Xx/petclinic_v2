@@ -19,7 +19,7 @@ public class Issue extends IdEntity {
     private Pet pet;
 
     @Column(name = "Description")
-    private String Description;
+    private String description;
 
     public Doctor getDoctor() {
         return doctor;
@@ -38,10 +38,10 @@ public class Issue extends IdEntity {
     }
 
     public String getDescription() {
-        return Description;
+        return description;
     }
 
     public void setDescription(String description) {
-        Description = description;
+        this.description = description;
     }
 }
