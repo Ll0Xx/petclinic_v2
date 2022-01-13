@@ -1,6 +1,7 @@
 package com.antont.petclinic.v2.security;
 
 import com.antont.petclinic.v2.auth.UserDetailServiceImpl;
+import com.antont.petclinic.v2.auth.dto.MyAuthenticationSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -11,6 +12,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,13 +40,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/user", "/user/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/doctor", "/doctor/**").hasAnyRole("DOCTOR", "ADMIN")
                 .antMatchers("/**", "/webjars/**", "/process_register").permitAll()
                 .and()
                 .formLogin()
                 .loginPage("/login")
                 .failureHandler(getHandler())
                 .loginProcessingUrl("/perform_login")
-                .defaultSuccessUrl("/user", true).permitAll()
+                .successHandler(myAuthenticationSuccessHandler())
+                .permitAll()
                 .and()
                 .logout().logoutSuccessUrl("/").permitAll();
     }
@@ -64,5 +68,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
+        return new MyAuthenticationSuccessHandler();
     }
 }
