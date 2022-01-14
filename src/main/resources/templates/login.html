@@ -69,8 +69,21 @@
                     <label for="sign-up-confirm-password">Confirm password</label>
                 </div>
 
-                <div class="d-grid gap-2">
-                    <button class="btn btn-primary mb-3" type="submit">Log in</button>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox"  th:field="*{doctor}" value="" id="isDoctor">
+                    <label class="form-check-label" for="isDoctor">
+                       Create doctor?
+                    </label>
+                </div>
+
+                <select id="doctorSpecializationSelector" class="form-select mb-3 d-none" th:field="*{doctorSpecialization}" required>
+                    <option value="" selected>Select specializations</option>
+                    <option th:each="specialization : ${doctorSpecializationsList}" th:value="${specialization.id}"
+                            th:text="${specialization.name}"></option>
+                </select>
+
+                <div class="d-grid gap-2 mt-3">
+                    <button class="btn btn-primary mb-3" type="submit">Create new user</button>
                 </div>
 
             </form>
@@ -84,5 +97,6 @@
 <script th:src="@{/webjars/popper.js/2.9.3/umd/popper.min.js}"></script>
 <script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
 <script th:src="@{/js/tabs.js}"></script>
+<script th:src="@{/js/login.js}"></script>
 
 </html>
