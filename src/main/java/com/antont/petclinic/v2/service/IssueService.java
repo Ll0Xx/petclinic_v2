@@ -1,5 +1,6 @@
 package com.antont.petclinic.v2.service;
 
+import com.antont.petclinic.v2.db.entity.Doctor;
 import com.antont.petclinic.v2.db.entity.Issue;
 import com.antont.petclinic.v2.db.entity.User;
 import com.antont.petclinic.v2.db.repository.DoctorRepository;
@@ -30,12 +31,24 @@ public class IssueService {
         this.petRepository = petRepository;
     }
 
-    public List<Issue> getIssues(User user){
+    public List<Issue> findIssuesForUser(User user){
         return issueRepository.findByPetOwner(user);
     }
 
-    public Issue handlePetRequest(IssueDto dto) {
-        return dto.getPet() == null ? create(dto) : update(dto);
+    public List<Issue> findIssuesForDoctor(Doctor user){
+        return issueRepository.findByDoctor(user);
+    }
+
+    public List<Issue> findAllIssues(){
+        return issueRepository.findAll();
+    }
+
+    public List<Issue> findByKeyword(String keyword){
+        return issueRepository.findByPetNameLike("%" + keyword + "%");
+    }
+
+    public Issue handleIssueRequest(IssueDto dto) {
+        return dto.getId() == null ? create(dto) : update(dto);
     }
 
     private Issue create(IssueDto dto) {
@@ -43,7 +56,7 @@ public class IssueService {
         doctorRepository.findById(dto.getDoctor()).ifPresentOrElse(issue::setDoctor, () -> {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to create pet issue");
         });
-        petRepository.findById(dto.getId()).ifPresentOrElse(issue::setPet, () -> {
+        petRepository.findById(dto.getPet()).ifPresentOrElse(issue::setPet, () -> {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to create pet issue");
         });
         issue.setDescription(dto.getDescription());

@@ -6,6 +6,7 @@ import com.antont.petclinic.v2.db.entity.User;
 import com.antont.petclinic.v2.db.repository.PetRepository;
 import com.antont.petclinic.v2.db.repository.PetTypeRepository;
 import com.antont.petclinic.v2.dto.PetDto;
+import org.apache.logging.log4j.util.StringBuilders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,6 +34,10 @@ public class PetService {
         return getPets().stream()
                 .map(Pet::getName)
                 .collect(Collectors.joining(", "));
+    }
+
+    public List<Pet> findByKeyword(String keyword){
+        return petRepository.findByNameLike("%" + keyword + "%");
     }
 
     public Pet handlePetRequest(PetDto dto) {

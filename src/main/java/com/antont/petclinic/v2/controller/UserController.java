@@ -36,7 +36,7 @@ public class UserController {
         }
 
         model.addAttribute("petTypes", petService.getPetTypes());
-        model.addAttribute("issues", issueService.getIssues(user));
+        model.addAttribute("issues", issueService.findIssuesForUser(user));
         return "user";
     }
 }

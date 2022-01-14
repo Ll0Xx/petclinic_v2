@@ -13,4 +13,6 @@ public interface PetRepository extends JpaRepository<Pet, BigInteger> {
     List<Pet> findByOwner(User owner);
 
     Optional<Pet> findByIdAndOwner(BigInteger id, User owner);
+
+    List<Pet> findByNameLike(String keyword);
 }
