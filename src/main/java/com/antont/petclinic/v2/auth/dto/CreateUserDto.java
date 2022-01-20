@@ -1,22 +1,37 @@
 package com.antont.petclinic.v2.auth.dto;
 
+import com.antont.petclinic.v2.validation.annotation.FieldsValueMatch;
+import com.antont.petclinic.v2.validation.annotation.Password;
+import com.antont.petclinic.v2.validation.annotation.UniqueEmail;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 
+@FieldsValueMatch.List({
+        @FieldsValueMatch(
+                field = "password",
+                fieldMatch = "confirmPassword",
+                message = "Passwords do not match!"
+        )
+})
 public class CreateUserDto {
     @NotNull
+    @NotBlank
+    @UniqueEmail
     @Email
     private String email;
 
     @NotNull
-    @Length(min = 3, max = 25)
+    @Password
+    @Length(min = 8, max = 25)
     private String password;
 
     @NotNull
-    @Length(min = 3, max = 25)
+    @Password
+    @Length(min = 8, max = 25)
     private String confirmPassword;
 
     private Boolean isDoctor = false;

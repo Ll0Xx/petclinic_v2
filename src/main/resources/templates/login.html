@@ -49,7 +49,7 @@
         </form>
     </div>
         <div class="tab-pane mt-5 fade" id="tabs-tabs-2" role="tabpanel" aria-labelledby="tabs-tab-2">
-            <form th:action="@{/process_register}" th:object="${createUserDto}" method="post">
+            <form id="registerForm" class="needs-validation" th:action="@{/process_register}" th:object="${createUserDto}" method="post">
                 <p class="fs-3 text-center">Create new account</p>
 
                 <div class="form-floating mb-3">
@@ -64,9 +64,9 @@
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="sign-up-confirm-password"
+                    <input type="password" class="form-control" id="sign-up-confirmPassword"
                            th:field="*{confirmPassword}" placeholder="Confirm password">
-                    <label for="sign-up-confirm-password">Confirm password</label>
+                    <label for="sign-up-confirmPassword">Confirm password</label>
                 </div>
 
                 <div class="form-check mb-3">
