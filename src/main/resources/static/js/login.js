@@ -1,4 +1,12 @@
 $(document).ready(function (){
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    if(urlParams.has('error')){
+        $("#login-error-message").removeClass("d-none");
+        $("#login-email").addClass('is-invalid');
+        $("#login-password").addClass('is-invalid');
+    }
+
     const $checkbox = $('#isDoctor');
     const $selector = $('#doctorSpecializationSelector');
     updateDoctorTypeSelectorVisibility($checkbox, $selector);
