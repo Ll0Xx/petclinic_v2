@@ -5,6 +5,7 @@ import com.antont.petclinic.v2.service.AuthService;
 import com.antont.petclinic.v2.validation.ValidationResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -19,7 +20,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/process_register")
-    public ValidationResult processRegister(@Valid CreateUserDto dto, BindingResult bindingResult) {
+    public ValidationResult processRegister(@Valid @RequestBody CreateUserDto dto, BindingResult bindingResult) {
         ValidationResult validationResult = new ValidationResult();
         if (bindingResult.hasErrors()) {
             validationResult.setSuccess(false);

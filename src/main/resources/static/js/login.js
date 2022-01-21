@@ -34,18 +34,11 @@ $(document).ready(function (){
         try {
             $.ajax({
                 url: $form.attr('action'),
+                contentType: 'application/json',
                 type: 'post',
-                data: $form.serialize(),
+                data: JSON.stringify(toJsonObject($form.serializeArray())),
                 success: function (response) {
-                    console.log("success", response)
-                    response.errors.forEach(item =>{
-                        addErrorMessage(item.field, item.defaultMessage)
-                        if (item.code === "FieldsValueMatch") {
-                            addErrorMessage("confirmPassword", item.defaultMessage)
-                            addErrorMessage("password", item.defaultMessage)
-                        }
-                    })
-                    // $form.addClass('was-validated');
+                    createErrorFields(response);
                 },
                 error: function (response) {
                     console.error("error", response);
@@ -56,14 +49,24 @@ $(document).ready(function (){
         }
     })
 
+    function createErrorFields(response) {
+        response.errors.forEach(item => {
+            addErrorMessage(item.field, item.defaultMessage)
+            if (item.code === "FieldsValueMatch") {
+                addErrorMessage("confirmPassword", item.defaultMessage)
+                addErrorMessage("password", item.defaultMessage)
+            }
+        })
+    }
+
     function addErrorMessage(field, message){
-        console.log(`Create error message for field ${field} with message ${message}`);
-        $(`#sign-up-${field}`).parent().append(`
+        const $field = $(`#sign-up-${field}`);
+        $field.parent().append(`
             <p class="sign-up-error-message text-danger">
                 ${message}
             </p>
         `);
-        $(`#sign-up-${field}`).addClass('is-invalid')
+        $field.addClass('is-invalid')
     }
 
     function deleteErrorMessages(){
@@ -71,3 +74,11 @@ $(document).ready(function (){
         console.log('Delete all error messages');
     }
 })
+
+function toJsonObject(formArray) {
+    const returnArray = {};
+    for (let i = 0; i < formArray.length; i++){
+        returnArray[formArray[i]['name']] = formArray[i]['value'];
+    }
+    return returnArray;
+}
