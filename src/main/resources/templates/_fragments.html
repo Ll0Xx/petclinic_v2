@@ -18,7 +18,8 @@
     <ul class="nav nav-pills">
         <li class="nav-item"><a th:href="@{/}" class="nav-link">Home</a></li>
         <li sec:authorize="!isAuthenticated()" class="nav-item"><a th:href="@{/login}" class="nav-link">Log in</a></li>
-        <li sec:authorize="isAuthenticated()" class="nav-item"><a th:href="@{/user}" class="nav-link">My Account</a></li>
+        <li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a th:href="@{/user}" class="nav-link">My Account</a></li>
+        <li sec:authorize="hasRole('ROLE_DOCTOR')" class="nav-item"><a th:href="@{/doctor}" class="nav-link">Issues</a></li>
         <li sec:authorize="isAuthenticated()" class="nav-item"><a th:href="@{/logout}" class="nav-link">Logout</a></li>
     </ul>
 </header>
