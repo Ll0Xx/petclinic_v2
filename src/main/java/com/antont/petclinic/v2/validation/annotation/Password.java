@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface Password {
 
-    String message() default "Password must contains digit, lower and upper case letter, special characters and no whitespace allowed";
+    String message() default "{validation.invalid-password}";
 
     Class<?>[] groups() default {};
 

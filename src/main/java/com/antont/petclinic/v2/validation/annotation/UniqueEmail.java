@@ -16,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ TYPE, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
 public @interface UniqueEmail {
-    String message() default "This value is already exist";
+    String message() default "{validation.email}";
 
     Class<?>[] groups() default {};
 

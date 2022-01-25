@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FieldsValueMatch {
 
-    String message() default "Fields values don't match!";
+    String message() default "{validation.fields-not-match}";
 
     Class<?>[] groups() default {};
 
