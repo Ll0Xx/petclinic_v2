@@ -15,15 +15,18 @@
       <div class="modal-body">
         <form id="petForm" th:object="${pet}" th:action="@{/user/pet/create}" method="post">
           <div class="form-floating mb-3">
-            <input type="text" class="form-control" th:field="*{name}" id="petName" placeholder="Pet name">
-            <label class="text-secondary" for="petName">Pet name</label>
+            <input type="text" class="form-control" th:field="*{name}" id="pet-modal-name" placeholder="Pet name"
+                   required>
+            <label class="text-secondary" for="pet-modal-name">Pet name</label>
           </div>
 
-          <select class="form-select" th:field="*{petType}" id="editPetType" required>
-            <option value="" selected>Select pet Type</option>
-            <option th:each="type : ${petTypes}" th:value="${type.id}"
-                    th:text="${type.name}"></option>
-          </select>
+          <div>
+            <select class="form-select" th:field="*{petType}" id="pet-modal-petType" required>
+              <option value="" selected>Select pet Type</option>
+              <option th:each="type : ${petTypes}" th:value="${type.id}"
+                      th:text="${type.name}"></option>
+            </select>
+          </div>
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

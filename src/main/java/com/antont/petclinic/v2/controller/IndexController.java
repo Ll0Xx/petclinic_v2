@@ -1,4 +1,4 @@
-package com.antont.petclinic.v2;
+package com.antont.petclinic.v2.controller;
 
 import com.antont.petclinic.v2.service.DoctorService;
 import org.springframework.stereotype.Controller;

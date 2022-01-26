@@ -37,11 +37,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/user", "/user/**").hasAnyRole("USER", "ADMIN")
                 .antMatchers("/doctor", "/doctor/**").hasAnyRole("DOCTOR", "ADMIN")
-                .antMatchers("/**", "/webjars/**", "/process_register").permitAll()
+                .antMatchers("/webjars/**", "/process_register", "/assets").permitAll()
                 .and()
                 .formLogin()
                 .loginPage("/login")
@@ -50,7 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .successHandler(myAuthenticationSuccessHandler())
                 .permitAll()
                 .and()
-                .logout().logoutSuccessUrl("/").permitAll();
+                .logout()
+                .logoutSuccessUrl("/").permitAll();
     }
 
     private AuthenticationFailureHandler getHandler(){

@@ -21,14 +21,20 @@ $(document).ready(function () {
     const $form = $('#petForm');
     $form.on('submit', function (e) {
         e.preventDefault();
+        deleteErrorMessages();
         try {
             $.ajax({
                 url: $form.attr('action'),
                 type: 'post',
                 data: $form.serialize(),
                 success: function (response) {
-                    $('#petModal').modal('toggle');
-                    updatePetTable(response)
+                    console.log(response)
+                    if(response.success === true){
+                        $('#petModal').modal('toggle');
+                        updatePetTable(response.result)
+                    }else{
+                        createErrorFields(response);
+                    }
                 },
                 error: function (response) {
                     console.error(response);
@@ -74,12 +80,33 @@ function updatePetTable(pet) {
     }
 }
 
+function createErrorFields(response) {
+    response.errors.forEach(item => {
+        console.log(item)
+        const $field = $(`#pet-modal-${item.field}`);
+        $field.parent().append(`
+            <p class="pet-modal-message text-danger mt-3">
+                ${item.defaultMessage}
+            </p>
+        `);
+        $field.addClass('is-invalid')
+    })
+}
+
+function deleteErrorMessages(){
+    $(`.pet-modal-message`).remove();
+}
+
 function deletePet(id) {
+    const token = $("meta[name='_csrf']").attr("content");
     if (confirm('Do you want to remove this pet from the database??')) {
         try {
             $.ajax({
                 url: `user/pet/delete/${id}`,
                 type: 'delete',
+                headers: {
+                    'X-CSRF-TOKEN': token
+                },
                 success: function (response) {
                     console.log('item deleted', response);
                     deleteRow(response)

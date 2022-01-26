@@ -5,9 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+@ComponentScan({"com.antont.petclinic.v2", "asset.pipeline.springboot"})
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class PetclinicV2Application {
 
@@ -24,9 +26,9 @@ public class PetclinicV2Application {
     }
 
     @Bean
-    public LocalValidatorFactoryBean validator() {
+    public LocalValidatorFactoryBean validator(MessageSource messageSource) {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-        bean.setValidationMessageSource(messageSource());
+        bean.setValidationMessageSource(messageSource);
         return bean;
     }
 }

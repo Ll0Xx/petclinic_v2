@@ -11,6 +11,8 @@
 <body>
 
 <header th:fragment="header" class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+<!--    <meta th:name="_csrf" th:content="${_csrf.token}"/>-->
+
     <a th:href="@{/}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
         <span class="fs-4 ms-3">Pet Clinic v2</span>
     </a>
@@ -20,7 +22,11 @@
         <li sec:authorize="!isAuthenticated()" class="nav-item"><a th:href="@{/login}" class="nav-link">Log in</a></li>
         <li sec:authorize="hasRole('ROLE_USER')" class="nav-item"><a th:href="@{/user}" class="nav-link">My Account</a></li>
         <li sec:authorize="hasRole('ROLE_DOCTOR')" class="nav-item"><a th:href="@{/doctor}" class="nav-link">Issues</a></li>
-        <li sec:authorize="isAuthenticated()" class="nav-item"><a th:href="@{/logout}" class="nav-link">Logout</a></li>
+        <li sec:authorize="isAuthenticated()" class="nav-item">
+            <form th:action="@{/logout}" action="/logout" method=post>
+                <input class="nav-link" type="submit" value="logout">
+            </form>
+        </li>
     </ul>
 </header>
 </body>
