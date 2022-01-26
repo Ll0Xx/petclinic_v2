@@ -1,11 +1,13 @@
 package com.antont.petclinic.v2.rest;
 
-import com.antont.petclinic.v2.db.entity.Pet;
 import com.antont.petclinic.v2.dto.PetDto;
 import com.antont.petclinic.v2.service.PetService;
+import com.antont.petclinic.v2.validation.ValidationResult;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.math.BigInteger;
 
 @RestController
@@ -18,8 +20,16 @@ public class PetController {
     }
 
     @PostMapping(path = "/user/pet/create")
-    public ResponseEntity<Pet> update(@ModelAttribute PetDto dto) {
-        return ResponseEntity.ok().body(petService.handlePetRequest(dto));
+    public ValidationResult update(@ModelAttribute @Valid PetDto dto, BindingResult bindingResult) {
+        ValidationResult result = new ValidationResult();
+        if(bindingResult.hasErrors()){
+            result.setSuccess(false);
+            result.setErrors(bindingResult.getAllErrors());
+        }else{
+            result.setSuccess(true);
+            result.setResult(petService.handlePetRequest(dto));
+        }
+        return result;
     }
 
     @DeleteMapping(path = "/user/pet/delete/{id}")
