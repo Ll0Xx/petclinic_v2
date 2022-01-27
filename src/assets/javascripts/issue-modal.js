@@ -81,11 +81,15 @@ function updateIssueTable(issue) {
 }
 
 function deleteIssue(id) {
+    const token = $("meta[name='_csrf']").attr("content");
     if (confirm('Do you want to remove this pet from the database??')) {
         try {
             $.ajax({
                 url: `doctor/issue/delete/${id}`,
                 type: 'delete',
+                headers: {
+                    'X-CSRF-TOKEN': token
+                },
                 success: function (response) {
                     console.log('item deleted', response);
                     deleteRow(response)
