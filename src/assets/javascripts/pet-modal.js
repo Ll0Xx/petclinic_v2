@@ -1,9 +1,9 @@
 $('#petModal').on('show.bs.modal', function (event) {
     const id = event.relatedTarget.getAttribute('data-bs-id');
     const name = event.relatedTarget.getAttribute('data-bs-name');
-    $('#petName').val(name);
+    $('#pet-modal-name').val(name);
     const type = event.relatedTarget.getAttribute('data-bs-type');
-    $('#editPetType').val(type);
+    $('#pet-modal-petType').val(type);
     console.log(id);
     if (id) {
         $('<input>').attr({
