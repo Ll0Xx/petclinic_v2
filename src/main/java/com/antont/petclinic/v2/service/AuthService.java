@@ -8,6 +8,8 @@ import com.antont.petclinic.v2.db.repository.DoctorRepository;
 import com.antont.petclinic.v2.db.repository.DoctorSpecializationRepository;
 import com.antont.petclinic.v2.db.repository.RoleRepository;
 import com.antont.petclinic.v2.db.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ import java.util.Optional;
 
 @Service
 public class AuthService {
+
+    Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -52,6 +56,7 @@ public class AuthService {
                 doc.setDoctorSpecialization(doctorSpecialization);
                 doctorRepository.save(doc);
             }, () -> {
+                log.error("Doctor specialization with id " + dto.getDoctorSpecialization() + " not found");
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while creating doctor");
             });
         }

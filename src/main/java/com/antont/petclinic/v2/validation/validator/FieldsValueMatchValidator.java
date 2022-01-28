@@ -22,10 +22,10 @@ public class FieldsValueMatchValidator
         Object fieldValue = new BeanWrapperImpl(value).getPropertyValue(field);
         Object fieldMatchValue = new BeanWrapperImpl(value).getPropertyValue(fieldMatch);
 
-        if (fieldValue != null) {
+        if (fieldValue != null && fieldMatchValue != null) {
             return fieldValue.equals(fieldMatchValue);
         } else {
-            return fieldMatchValue == null;
+            return false;
         }
     }
 }

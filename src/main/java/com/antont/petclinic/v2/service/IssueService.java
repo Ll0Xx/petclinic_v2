@@ -7,6 +7,8 @@ import com.antont.petclinic.v2.db.repository.DoctorRepository;
 import com.antont.petclinic.v2.db.repository.IssueRepository;
 import com.antont.petclinic.v2.db.repository.PetRepository;
 import com.antont.petclinic.v2.dto.IssueDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,6 +19,8 @@ import java.util.Optional;
 
 @Service
 public class IssueService {
+
+    Logger log = LoggerFactory.getLogger(IssueService.class);
 
     private final UserService userService;
     private final DoctorRepository doctorRepository;
@@ -54,9 +58,11 @@ public class IssueService {
     private Issue create(IssueDto dto) {
         Issue issue = new Issue();
         doctorRepository.findById(dto.getDoctor()).ifPresentOrElse(issue::setDoctor, () -> {
+            log.error("Failed to create, doctor with id " + dto.getDoctor() + " not found");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to create pet issue");
         });
         petRepository.findById(dto.getPet()).ifPresentOrElse(issue::setPet, () -> {
+            log.error("Failed to create, pet with id " + dto.getPet() + " not found");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to create pet issue");
         });
         issue.setDescription(dto.getDescription());
@@ -76,6 +82,7 @@ public class IssueService {
             issue1.setDescription(dto.getDescription());
             return issueRepository.save(issue1);
         }).orElseThrow(() -> {
+            log.error("Failed to update, issue with id " + dto.getId() + " not found");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to modify pet issue");
         });
     }
@@ -85,6 +92,7 @@ public class IssueService {
             issueRepository.delete(issue);
             return issue.getId();
         }).orElseThrow(() -> {
+            log.error("Failed to delete, issue with id " + id + " not found");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to delete pet issue");
         });
     }

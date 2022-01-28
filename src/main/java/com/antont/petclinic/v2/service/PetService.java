@@ -7,6 +7,8 @@ import com.antont.petclinic.v2.db.repository.PetRepository;
 import com.antont.petclinic.v2.db.repository.PetTypeRepository;
 import com.antont.petclinic.v2.dto.PetDto;
 import org.apache.logging.log4j.util.StringBuilders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class PetService {
+
+    Logger log = LoggerFactory.getLogger(PetService.class);
 
     private final UserService userService;
     private final PetRepository petRepository;
@@ -61,6 +65,7 @@ public class PetService {
             petConsumer.accept(pet1);
             return pet1;
         }).orElseThrow(() -> {
+            log.error("Failed to update, pet with id " + id + " for user " + user.getEmail() + " not found");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to modify/delete pet");
         });
     }
@@ -83,6 +88,7 @@ public class PetService {
 
     private PetType getPetType(BigInteger id) {
         return petTypeRepository.findById(id).orElseThrow(() -> {
+            log.error("Failed to update, pet type with id " + id + " not found");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet type with id: " + id + " not found");
         });
     }
