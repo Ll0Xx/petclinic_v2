@@ -6,9 +6,11 @@ import com.antont.petclinic.v2.db.entity.User;
 import com.antont.petclinic.v2.db.repository.PetRepository;
 import com.antont.petclinic.v2.db.repository.PetTypeRepository;
 import com.antont.petclinic.v2.dto.PetDto;
-import org.apache.logging.log4j.util.StringBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,6 +23,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class PetService {
+
+    private static final Integer DEFAULT_PAGE_SIZE = 5;
+    private static final Integer DEFAULT_START_PAGE = 1;
 
     Logger log = LoggerFactory.getLogger(PetService.class);
 
@@ -91,6 +96,12 @@ public class PetService {
             log.error("Failed to update, pet type with id " + id + " not found");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet type with id: " + id + " not found");
         });
+    }
+
+    public Page<Pet> getPetsPaged(Optional<Integer> page, Optional<Integer> size) {
+        Integer p = page.orElse(DEFAULT_START_PAGE);
+        Integer s = size.orElse(DEFAULT_PAGE_SIZE);
+        return petRepository.findAllByOwner(userService.getLoggedInUser(), PageRequest.of(p, s));
     }
 
     public List<Pet> getPets() {

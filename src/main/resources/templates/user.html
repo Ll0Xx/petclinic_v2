@@ -44,22 +44,22 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="pet: ${pets}">
-                    <td class="pet-id" th:text="${pet.getId()}"></td>
-                    <td class="pet-name" th:text="${pet.getName()}"></td>
-                    <td class="pet-type" th:text="${pet.getPetType().getName()}"></td>
-                    <td>
-                        <button type="button" class="btn btn-primary" th:attr="data-bs-id=${pet.getId()},
-                        data-bs-name=${pet.getName()}, data-bs-type=${pet.getPetType().getId()}" data-bs-toggle="modal"
-                                data-bs-target="#petModal">
-                            Edit
-                        </button>
-                        <button type="button" class="btn btn-danger" th:attr="data-bs-id=${pet.getId()}"
-                                th:onclick="|deletePet('${pet.getId()}')|">
-                            delete
-                        </button>
-                    </td>
-                </tr>
+<!--                <tr th:each="pet: ${pets}">-->
+<!--                    <td class="pet-id" th:text="${pet.getId()}"></td>-->
+<!--                    <td class="pet-name" th:text="${pet.getName()}"></td>-->
+<!--                    <td class="pet-type" th:text="${pet.getPetType().getName()}"></td>-->
+<!--                    <td>-->
+<!--                        <button type="button" class="btn btn-primary" th:attr="data-bs-id=${pet.getId()},-->
+<!--                        data-bs-name=${pet.getName()}, data-bs-type=${pet.getPetType().getId()}" data-bs-toggle="modal"-->
+<!--                                data-bs-target="#petModal">-->
+<!--                            Edit-->
+<!--                        </button>-->
+<!--                        <button type="button" class="btn btn-danger" th:attr="data-bs-id=${pet.getId()}"-->
+<!--                                th:onclick="|deletePet('${pet.getId()}')|">-->
+<!--                            delete-->
+<!--                        </button>-->
+<!--                    </td>-->
+<!--                </tr>-->
                 </tbody>
             </table>
         </div>

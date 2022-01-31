@@ -18,6 +18,8 @@ $('#petModal').on('show.bs.modal', function (event) {
 
 
 $(document).ready(function () {
+    loadContent(0, 5);
+
     const $form = $('#petForm');
     $form.on('submit', function (e) {
         e.preventDefault();
@@ -45,6 +47,47 @@ $(document).ready(function () {
             console.error(e);
         }
     })
+
+    function loadContent(page, size){
+        try {
+            $.ajax({
+                url: `${window.location}/pets?page=${page}&size=${size}`,
+                type: 'get',
+                success: function (response) {
+                    console.log(response)
+                    $('.pet-table-element').remove();
+                    $('.pet-table-control').remove();
+                    response.content.forEach(item => {
+                        addRow(item)
+                    })
+                    if(response.totalPages > 1){
+                        let list = $('<ul/>').addClass('pet-table-control list-group list-group-horizontal');
+                        for (let i = 0; i < response.totalPages; i++) {
+                            const li = $('<li/>')
+                                .addClass('list-group-item')
+                                .appendTo(list);
+                            const aaa = $('<button/>')
+                                .text(i)
+                                .addClass(`btn btn-${page === i ?  'light' : 'primary'}`)
+                                .click(function () {
+                                    loadContent(i, 5)
+                                })
+                                .appendTo(li);
+                        }
+
+                        list.appendTo($('#petsListContainer'));
+                        console.log('create navigation');
+                    }
+                },
+                error: function (response) {
+                    console.error(response);
+                    $('#petModal').modal('toggle');
+                }
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
 })
 
 function updatePetTable(pet) {
@@ -55,29 +98,34 @@ function updatePetTable(pet) {
             $('#petsListContainer').removeClass('d-none');
             $('#noPetsMessageContainer').addClass('d-none');
         }
-        $table.append(
-            `<tr>
-                    <td class="pet-id">${pet.id}</td>
-                    <td class="pet-name">${pet.name}</td>
-                    <td class="pet-type">${pet.petType.name}</td>
-                    <td>
-                        <button type="button" class="btn btn-primary" data-bs-id='${pet.id}' data-bs-name='${pet.name}'
-                            data-bs-type='${pet.petType.id}' data-bs-toggle='modal' data-bs-target='#petModal'>
-                            Edit
-                        </button>
-                        <button type="button" class="btn btn-danger" th:attr="data-bs-id=${pet.id}"
-                                onclick="deletePet(${pet.id})">
-                            delete
-                        </button>
-                    </td>
-                </tr>`
-        )
+        addRow(pet)
     } else {
         $row.find('.pet-name').text(pet.name);
         $row.find('.pet-type').text(pet.petType.name);
         $row.find('.btn-primary').attr('data-bs-name', pet.name);
         $row.find('.btn-primary').attr('data-bs-type', pet.petType.id);
     }
+}
+
+function addRow(pet) {
+    const $table = $('#petsTable tbody');
+    $table.append(
+        `<tr class="pet-table-element">
+            <td class="pet-id">${pet.id}</td>
+            <td class="pet-name">${pet.name}</td>
+            <td class="pet-type">${pet.petType.name}</td>
+            <td>
+                <button type="button" class="btn btn-primary" data-bs-id='${pet.id}' data-bs-name='${pet.name}'
+                    data-bs-type='${pet.petType.id}' data-bs-toggle='modal' data-bs-target='#petModal'>
+                        Edit
+                </button>
+                <button type="button" class="btn btn-danger" th:attr="data-bs-id=${pet.id}"
+                    onclick="deletePet(${pet.id})">
+                        delete
+                </button>
+            </td>
+        </tr>`
+    )
 }
 
 function createErrorFields(response) {
