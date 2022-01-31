@@ -1,13 +1,15 @@
 package com.antont.petclinic.v2.rest;
 
-import com.antont.petclinic.v2.db.entity.Issue;
 import com.antont.petclinic.v2.db.entity.Pet;
 import com.antont.petclinic.v2.dto.IssueDto;
 import com.antont.petclinic.v2.service.IssueService;
 import com.antont.petclinic.v2.service.PetService;
+import com.antont.petclinic.v2.validation.ValidationResult;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -23,8 +25,16 @@ public class IssueController {
     }
 
     @PostMapping(path = "/doctor/issue/create")
-    public ResponseEntity<Issue> update(@ModelAttribute IssueDto dto) {
-        return ResponseEntity.ok().body(issueService.handleIssueRequest(dto));
+    public ValidationResult update(@Valid @ModelAttribute IssueDto dto, BindingResult bindingResult) {
+       ValidationResult result = new ValidationResult();
+        if(bindingResult.hasErrors()){
+            result.setSuccess(false);
+            result.setErrors(bindingResult.getAllErrors());
+        }else{
+            result.setSuccess(true);
+            result.setResult(issueService.handleIssueRequest(dto));
+        }
+        return result;
     }
 
     @DeleteMapping(path = "/doctor/issue/delete/{id}")

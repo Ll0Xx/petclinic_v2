@@ -1,15 +1,24 @@
 package com.antont.petclinic.v2.dto;
 
+import com.antont.petclinic.v2.validation.annotation.Doctor;
+import com.antont.petclinic.v2.validation.annotation.Pet;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.math.BigInteger;
 
 public class IssueDto {
 
     private BigInteger id;
 
+    @Doctor
     private BigInteger doctor;
 
+    @Pet
     private BigInteger pet;
 
+    @NotBlank
+    @Size(min = 3, max = 255)
     private String description;
 
     public IssueDto() {

@@ -15,22 +15,26 @@
             <div class="modal-body">
                 <form id="issueForm" th:object="${issue}" th:action="@{/doctor/issue/create}" method="post">
 
-                    <select class="form-select mb-3" th:field="*{pet}" id="issuePet" required>
-                        <option value="" selected>Select pet</option>
-                        <option th:each="pet : ${pets}" th:value="${pet.id}"
-                                th:text="${pet.id +': ' + pet.name}"></option>
-                    </select>
+                    <div>
+                        <select class="form-select mb-3" th:field="*{pet}" id="issue-modal-pet" required>
+                            <option value="" selected>Select pet</option>
+                            <option th:each="pet : ${pets}" th:value="${pet.id}"
+                                    th:text="${pet.id +': ' + pet.name}"></option>
+                        </select>
+                    </div>
 
-                    <select class="form-select mb-3" th:field="*{doctor}" id="issueDoctor" required>
-                        <option value="" selected>Select doctor</option>
-                        <option th:each="doctor : ${doctors}" th:value="${doctor.id}"
-                                th:text="${doctor.doctorSpecialization.name + ' - ' + doctor.user.email}"></option>
-                    </select>
+                    <div>
+                        <select class="form-select mb-3" th:field="*{doctor}" id="issue-modal-doctor" required>
+                            <option value="" selected>Select doctor</option>
+                            <option th:each="doctor : ${doctors}" th:value="${doctor.id}"
+                                    th:text="${doctor.doctorSpecialization.name + ' - ' + doctor.user.email}"></option>
+                        </select>
+                    </div>
 
                     <div class="form-floating mb-3">
-                        <textarea class="form-control" th:field="*{description}" id="issueDescription" rows="5"
+                        <textarea class="form-control" th:field="*{description}" id="issue-modal-description" rows="5"
                                   placeholder="Pet name"></textarea>
-                        <label class="text-secondary" for="issueDescription">Issue description</label>
+                        <label class="text-secondary" for="issue-modal-description">Issue description</label>
                     </div>
 
                     <div class="modal-footer">

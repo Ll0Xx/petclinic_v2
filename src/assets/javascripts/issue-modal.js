@@ -1,11 +1,11 @@
 $('#issueModal').on('show.bs.modal', function (event) {
     const id = event.relatedTarget.getAttribute('data-bs-id');
     const pet = event.relatedTarget.getAttribute('data-bs-pet');
-    $('#issuePet').val(pet);
+    $('#issue-modal-pet').val(pet);
     const type = event.relatedTarget.getAttribute('data-bs-doctor');
-    $('#issueDoctor').val(type);
+    $('#issue-modal-doctor').val(type);
     const description = event.relatedTarget.getAttribute('data-bs-description');
-    $('#issueDescription').val(description);
+    $('#issue-modal-description').val(description);
     if (id) {
         $('<input>').attr({
             type: 'hidden',
@@ -19,16 +19,25 @@ $('#issueModal').on('show.bs.modal', function (event) {
 $(document).ready(function () {
     const $form = $('#issueForm');
     $form.on('submit', function (e) {
+        deleteErrorMessages()
         e.preventDefault();
+        const token = $("meta[name='_csrf']").attr("content");
         try {
             $.ajax({
                 url: $form.attr('action'),
                 type: 'post',
+                headers: {
+                    'X-CSRF-TOKEN': token
+                },
                 data: $form.serialize(),
                 success: function (response) {
-                    $('#issueModal').modal('toggle');
-                    updateIssueTable(response)
-                    console.log('updateIssueTable')
+                    console.log(response)
+                    if(response.success){
+                        $('#issueModal').modal('toggle');
+                        updateIssueTable(response.result)
+                    }else{
+                        createErrorFields(response);
+                    }
                 },
                 error: function (response) {
                     console.error(response);
@@ -78,6 +87,23 @@ function updateIssueTable(issue) {
         $row.find('.btn-primary').attr('data-bs-doctor', issue.doctor.id);
         $row.find('.btn-primary').attr('data-bs-description', issue.description);
     }
+}
+
+function createErrorFields(response) {
+    response.errors.forEach(item => {
+        console.log(item)
+        const $field = $(`#issue-modal-${item.field}`);
+        $field.parent().append(`
+            <p class="issue-modal-message text-danger mt-3">
+                ${item.defaultMessage}
+            </p>
+        `);
+        $field.addClass('is-invalid')
+    })
+}
+
+function deleteErrorMessages(){
+    $(`.issue-modal-message`).remove();
 }
 
 function deleteIssue(id) {
