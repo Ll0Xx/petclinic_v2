@@ -31,14 +31,23 @@ $(document).ready(function (){
     $form.on('submit', function (e) {
         deleteErrorMessages();
         e.preventDefault();
+        const token = $("meta[name='_csrf']").attr("content");
         try {
             $.ajax({
                 url: $form.attr('action'),
                 contentType: 'application/json',
                 type: 'post',
+                headers: {
+                    'X-CSRF-TOKEN': token
+                },
                 data: JSON.stringify(toJsonObject($form.serializeArray())),
                 success: function (response) {
-                    createErrorFields(response);
+                    if (response.success){
+                        $(`[href="#tabs-tabs-1"]`).tab('show');
+                        showToast();
+                    }else{
+                        createErrorFields(response);
+                    }
                 },
                 error: function (response) {
                     console.error("error", response);
@@ -48,6 +57,15 @@ $(document).ready(function (){
             console.error(e);
         }
     })
+
+    function showToast(){
+        const options = {
+            settings: {
+                duration: 2000,
+            }
+        };
+        iqwerty.toast.toast('Registration completed successfully!', options);
+    }
 
     function createErrorFields(response) {
         response.errors.forEach(item => {
