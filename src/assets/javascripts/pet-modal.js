@@ -1,3 +1,6 @@
+const DEFAULT_PAGE_SIZE = 5;
+const  DEFAULT_START_PAGE = 0;
+
 $('#petModal').on('show.bs.modal', function (event) {
     const id = event.relatedTarget.getAttribute('data-bs-id');
     const name = event.relatedTarget.getAttribute('data-bs-name');
@@ -18,7 +21,7 @@ $('#petModal').on('show.bs.modal', function (event) {
 
 
 $(document).ready(function () {
-    loadContent(0, 5);
+    loadContent(DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE);
 
     const $form = $('#petForm');
     $form.on('submit', function (e) {
@@ -66,12 +69,10 @@ $(document).ready(function () {
                             const li = $('<li/>')
                                 .addClass('list-group-item')
                                 .appendTo(list);
-                            const aaa = $('<button/>')
+                            $('<button/>')
                                 .text(i)
                                 .addClass(`btn btn-${page === i ?  'light' : 'primary'}`)
-                                .click(function () {
-                                    loadContent(i, 5)
-                                })
+                                .click(function () { loadContent(i, DEFAULT_PAGE_SIZE) })
                                 .appendTo(li);
                         }
 

@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
 public class PetService {
 
     private static final Integer DEFAULT_PAGE_SIZE = 5;
-    private static final Integer DEFAULT_START_PAGE = 1;
+    private static final Integer DEFAULT_START_PAGE = 0;
 
     Logger log = LoggerFactory.getLogger(PetService.class);
 
