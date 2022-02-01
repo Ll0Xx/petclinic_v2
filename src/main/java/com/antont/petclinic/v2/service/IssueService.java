@@ -7,8 +7,10 @@ import com.antont.petclinic.v2.db.repository.DoctorRepository;
 import com.antont.petclinic.v2.db.repository.IssueRepository;
 import com.antont.petclinic.v2.db.repository.PetRepository;
 import com.antont.petclinic.v2.dto.IssueDto;
+import com.antont.petclinic.v2.utils.PageableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -95,5 +97,9 @@ public class IssueService {
             log.error("Failed to delete, issue with id " + id + " not found");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to delete pet issue");
         });
+    }
+
+    public Page<Issue> getPagedForUser(Optional<Integer> page, Optional<Integer> size, Optional<String> sort, Optional<String> direction) {
+        return issueRepository.findAllByPetOwner(userService.getLoggedInUser(), PageableUtils.getPageable(page, size, sort, direction));
     }
 }

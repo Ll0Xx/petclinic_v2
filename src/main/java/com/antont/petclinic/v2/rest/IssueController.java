@@ -1,10 +1,12 @@
 package com.antont.petclinic.v2.rest;
 
+import com.antont.petclinic.v2.db.entity.Issue;
 import com.antont.petclinic.v2.db.entity.Pet;
 import com.antont.petclinic.v2.dto.IssueDto;
 import com.antont.petclinic.v2.service.IssueService;
 import com.antont.petclinic.v2.service.PetService;
 import com.antont.petclinic.v2.validation.ValidationResult;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class IssueController {
@@ -22,6 +25,14 @@ public class IssueController {
     public IssueController(IssueService issueService, PetService petService) {
         this.issueService = issueService;
         this.petService = petService;
+    }
+
+    @GetMapping(path = "/user/issue")
+    public Page<Issue> getPagedIssuesForUser(@RequestParam("page") Optional<Integer> page,
+                                             @RequestParam("size") Optional<Integer> size,
+                                             @RequestParam("sort") Optional<String> sort,
+                                             @RequestParam("dir") Optional<String> direction) {
+        return issueService.getPagedForUser(page, size, sort, direction);
     }
 
     @PostMapping(path = "/doctor/issue/create")

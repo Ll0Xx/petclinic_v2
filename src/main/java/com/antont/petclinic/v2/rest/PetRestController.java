@@ -22,7 +22,7 @@ public class PetRestController {
         this.petService = petService;
     }
 
-    @GetMapping(path = "/user/pets")
+    @GetMapping(path = "/user/pet")
     public Page<Pet> getPetsPaged(@RequestParam("page") Optional<Integer> page,
                                   @RequestParam("size") Optional<Integer> size,
                                   @RequestParam("sort") Optional<String> sort,

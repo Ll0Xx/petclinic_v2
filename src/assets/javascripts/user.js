@@ -24,11 +24,18 @@ $('#petModal').on('show.bs.modal', function (event) {
 });
 
 $(document).ready(function () {
-    loadContent(DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION);
+    loadContent('pet', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION);
+    loadContent('issue', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION);
 
-    prepareTableHeader('id')
-    prepareTableHeader('name')
-    prepareTableHeader('petType')
+    prepareTableHeader('pet', 'id');
+    prepareTableHeader('pet', 'name');
+    prepareTableHeader('pet', 'petType');
+
+    prepareTableHeader('issue', 'id');
+    prepareTableHeader('issue', 'doctor');
+    prepareTableHeader('issue', 'doctorDoctorSpecialization');
+    prepareTableHeader('issue', 'petName');
+    prepareTableHeader('issue', 'description');
 
     const $form = $('#petForm');
     $form.on('submit', function (e) {
@@ -58,37 +65,41 @@ $(document).ready(function () {
     })
 })
 
-function prepareTableHeader(id){
-    $(`#pet-table-${id}`).click(function () {
+function prepareTableHeader(table, id){
+    $(`#${table}-table-${id}`).click(function () {
         $(".asc").not(this).removeClass('asc')
         $(".desc").not(this).removeClass('desc')
-        if(!$(this).hasClass('asc') && !$(this).hasClass('desc')){
-            loadContent(currentPage, DEFAULT_PAGE_SIZE, id, 'asc');
+        const dir = !$(this).hasClass('asc') && !$(this).hasClass('desc') ? 'asc' : $(this).hasClass('asc')? 'desc' : 'asc';
+        loadContent(table, currentPage, DEFAULT_PAGE_SIZE, id, dir);
+        if (!$(this).hasClass('asc') && !$(this).hasClass('desc')) {
             $(this).toggleClass('asc');
-        }else{
-            loadContent(currentPage, DEFAULT_PAGE_SIZE, id, $(this).hasClass('asc')? 'desc' : 'asc');
+        } else {
             $(this).toggleClass('asc');
             $(this).toggleClass('desc');
         }
     })
 }
 
-function loadContent(page, size, sort, direction){
+function loadContent(table, page, size, sort, direction){
     currentPage = page;
     currentSortField = sort;
     currentSortDir = direction;
     try {
         $.ajax({
-            url: `${window.location}/pets?page=${page}&size=${size}&sort=${sort}&dir=${direction}`,
+            url: `${window.location}/${table}?page=${page}&size=${size}&sort=${sort}&dir=${direction}`,
             type: 'get',
             success: function (response) {
-                $('.pet-table-element').remove();
-                $('.pet-table-control').remove();
+                $(`.${table}-table-element`).remove();
+                $(`.${table}-table-control`).remove();
                 response.content.forEach(item => {
-                    addRow(item)
+                    if (table === 'pet') {
+                        addRow(item)
+                    } else {
+                        addIssueRow(item)
+                    }
                 })
                 if(response.totalPages > 1){
-                    let list = $('<ul/>').addClass('pet-table-control list-group list-group-horizontal');
+                    let list = $('<ul/>').addClass(`${table}-table-control list-group list-group-horizontal`);
                     for (let i = 0; i < response.totalPages; i++) {
                         const li = $('<li/>')
                             .addClass('m-1')
@@ -97,11 +108,11 @@ function loadContent(page, size, sort, direction){
                         $('<button/>')
                             .text(i)
                             .addClass(`btn btn-${page === i ?  'light' : 'primary'}`)
-                            .click(function () { loadContent(i, DEFAULT_PAGE_SIZE, currentSortField, currentSortDir) })
+                            .click(function () { loadContent(table, i, DEFAULT_PAGE_SIZE, currentSortField, currentSortDir) })
                             .appendTo(li);
                     }
 
-                    list.appendTo($('#petsListContainer'));
+                    list.appendTo($(`#${table}ListContainer`));
                 }
             },
             error: function (response) {
@@ -152,6 +163,19 @@ function addRow(pet) {
     )
 }
 
+function addIssueRow(issue) {
+    const $table = $('#issuesTable tbody');
+    $table.append(
+        `<tr class="issue-table-element">
+            <td>${issue.id}</td>
+            <td>${issue.doctor.user.email}</td>
+            <td>${issue.doctor.doctorSpecialization.name}</td>
+            <td>${issue.pet.name}</td>
+            <td>${issue.description}</td>
+        </tr>`
+    )
+}
+
 function createErrorFields(response) {
     response.errors.forEach(item => {
         console.log(item)
@@ -181,7 +205,7 @@ function deletePet(id) {
                 },
                 success: function (response) {
                     console.log('item deleted', response);
-                    deleteRow(response)
+                    deletePetTableRow(response)
                 },
                 error: function (response) {
                     console.error(response);
@@ -193,7 +217,7 @@ function deletePet(id) {
     }
 }
 
-function deleteRow(id){
+function deletePetTableRow(id){
     const $row = getRow(id);
     $row.remove();
     const $table = $('#petsTable tbody');

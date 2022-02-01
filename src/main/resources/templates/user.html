@@ -28,7 +28,7 @@
 <!-- Tabs content -->
 <div class="tab-content" id="tabs-content">
     <div class="tab-pane col-6 mx-auto fade show active" id="tabs-tabs-1" role="tabpanel" aria-labelledby="tabs-tab-1">
-        <div id="petsListContainer" th:classappend="${pets.isEmpty()} ? 'd-none' : ''">
+        <div id="petListContainer" th:classappend="${pets.isEmpty()} ? 'd-none' : ''">
             <div class="text-center my-3">
                 <span> List of your pet, click the button to add more </span>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#petModal">
@@ -61,26 +61,28 @@
         </div>
     </div>
     <div class="tab-pane col-10 mx-auto fade" id="tabs-tabs-2" role="tabpanel" aria-labelledby="tabs-tab-2">
-        <table th:unless="${issues.isEmpty()}" class="table table-striped">
-            <thead>
-            <tr class="fw-bold">
-                <td>Id</td>
-                <td>Doctor</td>
-                <td>Doctor specialization</td>
-                <td>Pet name</td>
-                <td>Issue description</td>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="issue: ${issues}">
-                <td th:text="${issue.getId()}"></td>
-                <td th:text="${issue.getDoctor().getUser().getEmail()}"></td>
-                <td th:text="${issue.getDoctor().getDoctorSpecialization().getName()}"></td>
-                <td th:text="${issue.getPet().getName()}"></td>
-                <td th:text="${issue.getDescription()}"></td>
-            </tr>
-            </tbody>
-        </table>
+        <div id="issuesListContainer">
+            <table id="issuesTable" th:unless="${issues.isEmpty()}" class="table table-striped">
+                <thead>
+                <tr class="fw-bold">
+                    <td id="issue-table-id" class="asc">Id</td>
+                    <td id="issue-table-doctor">Doctor</td>
+                    <td id="issue-table-doctorDoctorSpecialization">Doctor specialization</td>
+                    <td id="issue-table-petName">Pet name</td>
+                    <td id="issue-table-description">Issue description</td>
+                </tr>
+                </thead>
+                <tbody>
+<!--                <tr th:each="issue: ${issues}">-->
+<!--                    <td th:text="${issue.getId()}"></td>-->
+<!--                    <td th:text="${issue.getDoctor().getUser().getEmail()}"></td>-->
+<!--                    <td th:text="${issue.getDoctor().getDoctorSpecialization().getName()}"></td>-->
+<!--                    <td th:text="${issue.getPet().getName()}"></td>-->
+<!--                    <td th:text="${issue.getDescription()}"></td>-->
+<!--                </tr>-->
+                </tbody>
+            </table>
+        </div>
         <div th:if="${issues.isEmpty()}" class="text-center mt-5">
             You don't have a history of pet issues yet.
         </div>
@@ -94,7 +96,7 @@
 <script th:src="@{/webjars/popper.js/2.9.3/umd/popper.min.js}"></script>
 <script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
 <script th:src="@{assets/tabs.js}"></script>
-<script th:src="@{assets/pet-modal.js}"></script>
+<script th:src="@{assets/user.js}"></script>
 
 </body>
 </html>

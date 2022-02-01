@@ -6,6 +6,7 @@ import com.antont.petclinic.v2.db.entity.User;
 import com.antont.petclinic.v2.db.repository.PetRepository;
 import com.antont.petclinic.v2.db.repository.PetTypeRepository;
 import com.antont.petclinic.v2.dto.PetDto;
+import com.antont.petclinic.v2.utils.PageableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -101,12 +102,7 @@ public class PetService {
     }
 
     public Page<Pet> getPetsPaged(Optional<Integer> page, Optional<Integer> size, Optional<String> sort, Optional<String> direction) {
-        Integer p = page.orElse(DEFAULT_START_PAGE);
-        Integer s = size.orElse(DEFAULT_PAGE_SIZE);
-        String f = sort.orElse(DEFAULT_SORT);
-        Sort.Direction d = Sort.Direction.fromOptionalString(direction.orElse(DEFAULT_DIRECTION)).orElse(Sort.Direction.ASC);
-
-        return petRepository.findAllByOwner(userService.getLoggedInUser(), PageRequest.of(p, s, d, f));
+        return petRepository.findAllByOwner(userService.getLoggedInUser(), PageableUtils.getPageable(page, size, sort, direction));
     }
 
     public List<Pet> getPets() {
