@@ -61,7 +61,7 @@
         </div>
     </div>
     <div class="tab-pane col-10 mx-auto fade" id="tabs-tabs-2" role="tabpanel" aria-labelledby="tabs-tab-2">
-        <div id="issuesListContainer">
+        <div id="issueListContainer">
             <table id="issuesTable" th:unless="${issues.isEmpty()}" class="table table-striped">
                 <thead>
                 <tr class="fw-bold">
@@ -73,13 +73,6 @@
                 </tr>
                 </thead>
                 <tbody>
-<!--                <tr th:each="issue: ${issues}">-->
-<!--                    <td th:text="${issue.getId()}"></td>-->
-<!--                    <td th:text="${issue.getDoctor().getUser().getEmail()}"></td>-->
-<!--                    <td th:text="${issue.getDoctor().getDoctorSpecialization().getName()}"></td>-->
-<!--                    <td th:text="${issue.getPet().getName()}"></td>-->
-<!--                    <td th:text="${issue.getDescription()}"></td>-->
-<!--                </tr>-->
                 </tbody>
             </table>
         </div>
