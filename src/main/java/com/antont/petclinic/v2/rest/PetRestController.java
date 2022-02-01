@@ -24,8 +24,10 @@ public class PetRestController {
 
     @GetMapping(path = "/user/pets")
     public Page<Pet> getPetsPaged(@RequestParam("page") Optional<Integer> page,
-                                  @RequestParam("size") Optional<Integer> size){
-        return petService.getPetsPaged(page, size);
+                                  @RequestParam("size") Optional<Integer> size,
+                                  @RequestParam("sort") Optional<String> sort,
+                                  @RequestParam("dir") Optional<String> direction){
+        return petService.getPetsPaged(page, size, sort, direction);
     }
 
     @PostMapping(path = "/user/pet/create")

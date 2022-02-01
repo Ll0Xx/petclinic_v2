@@ -1,5 +1,10 @@
 const DEFAULT_PAGE_SIZE = 5;
-const  DEFAULT_START_PAGE = 0;
+const DEFAULT_START_PAGE = 0;
+const DEFAULT_SORT_FIELD = 'id';
+const DEFAULT_DIRECTION = 'asc';
+let currentPage = DEFAULT_START_PAGE;
+let currentSortField = DEFAULT_SORT_FIELD;
+let currentSortDir = DEFAULT_DIRECTION;
 
 $('#petModal').on('show.bs.modal', function (event) {
     const id = event.relatedTarget.getAttribute('data-bs-id');
@@ -18,10 +23,12 @@ $('#petModal').on('show.bs.modal', function (event) {
     }
 });
 
-
-
 $(document).ready(function () {
-    loadContent(DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE);
+    loadContent(DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION);
+
+    prepareTableHeader('id')
+    prepareTableHeader('name')
+    prepareTableHeader('petType')
 
     const $form = $('#petForm');
     $form.on('submit', function (e) {
@@ -33,7 +40,6 @@ $(document).ready(function () {
                 type: 'post',
                 data: $form.serialize(),
                 success: function (response) {
-                    console.log(response)
                     if(response.success === true){
                         $('#petModal').modal('toggle');
                         updatePetTable(response.result)
@@ -50,46 +56,63 @@ $(document).ready(function () {
             console.error(e);
         }
     })
-
-    function loadContent(page, size){
-        try {
-            $.ajax({
-                url: `${window.location}/pets?page=${page}&size=${size}`,
-                type: 'get',
-                success: function (response) {
-                    console.log(response)
-                    $('.pet-table-element').remove();
-                    $('.pet-table-control').remove();
-                    response.content.forEach(item => {
-                        addRow(item)
-                    })
-                    if(response.totalPages > 1){
-                        let list = $('<ul/>').addClass('pet-table-control list-group list-group-horizontal');
-                        for (let i = 0; i < response.totalPages; i++) {
-                            const li = $('<li/>')
-                                .addClass('list-group-item')
-                                .appendTo(list);
-                            $('<button/>')
-                                .text(i)
-                                .addClass(`btn btn-${page === i ?  'light' : 'primary'}`)
-                                .click(function () { loadContent(i, DEFAULT_PAGE_SIZE) })
-                                .appendTo(li);
-                        }
-
-                        list.appendTo($('#petsListContainer'));
-                        console.log('create navigation');
-                    }
-                },
-                error: function (response) {
-                    console.error(response);
-                    $('#petModal').modal('toggle');
-                }
-            });
-        } catch (e) {
-            console.error(e);
-        }
-    }
 })
+
+function prepareTableHeader(id){
+    $(`#pet-table-${id}`).click(function () {
+        $(".asc").not(this).removeClass('asc')
+        $(".desc").not(this).removeClass('desc')
+        if(!$(this).hasClass('asc') && !$(this).hasClass('desc')){
+            loadContent(currentPage, DEFAULT_PAGE_SIZE, id, 'asc');
+            $(this).toggleClass('asc');
+        }else{
+            loadContent(currentPage, DEFAULT_PAGE_SIZE, id, $(this).hasClass('asc')? 'desc' : 'asc');
+            $(this).toggleClass('asc');
+            $(this).toggleClass('desc');
+        }
+    })
+}
+
+function loadContent(page, size, sort, direction){
+    currentPage = page;
+    currentSortField = sort;
+    currentSortDir = direction;
+    try {
+        $.ajax({
+            url: `${window.location}/pets?page=${page}&size=${size}&sort=${sort}&dir=${direction}`,
+            type: 'get',
+            success: function (response) {
+                $('.pet-table-element').remove();
+                $('.pet-table-control').remove();
+                response.content.forEach(item => {
+                    addRow(item)
+                })
+                if(response.totalPages > 1){
+                    let list = $('<ul/>').addClass('pet-table-control list-group list-group-horizontal');
+                    for (let i = 0; i < response.totalPages; i++) {
+                        const li = $('<li/>')
+                            .addClass('m-1')
+                            .css('list-style', 'none')
+                            .appendTo(list);
+                        $('<button/>')
+                            .text(i)
+                            .addClass(`btn btn-${page === i ?  'light' : 'primary'}`)
+                            .click(function () { loadContent(i, DEFAULT_PAGE_SIZE, currentSortField, currentSortDir) })
+                            .appendTo(li);
+                    }
+
+                    list.appendTo($('#petsListContainer'));
+                }
+            },
+            error: function (response) {
+                console.error(response);
+                $('#petModal').modal('toggle');
+            }
+        });
+    } catch (e) {
+        console.error(e);
+    }
+}
 
 function updatePetTable(pet) {
     const $row = getRow(pet.id);
