@@ -129,7 +129,7 @@ function updatePetTable(pet) {
     if ($row.length <= 0) {
         const $table = $('#petsTable tbody');
         if ($table.children().length <= 1) {
-            $('#petsListContainer').removeClass('d-none');
+            $('#petListContainer').removeClass('d-none');
             $('#noPetsMessageContainer').addClass('d-none');
         }
         addRow(pet)
