@@ -47,7 +47,6 @@ $(document).ready(function () {
                 },
                 data: $form.serialize(),
                 success: function (response) {
-                    console.log(response)
                     if(response.success){
                         $('#issueModal').modal('toggle');
                         updateIssueTable(response.result)
@@ -124,7 +123,6 @@ function prepareTableHeader(id){
 
 function addRow(issue) {
     const $table = $('#doctorTable tbody');
-    console.log('issue.description', issue.description)
     $table.append(
         `<tr class="doctor-table-element">
             <td>${issue.id}</td>
@@ -170,7 +168,6 @@ function updateIssueTable(issue) {
 
 function createErrorFields(response) {
     response.errors.forEach(item => {
-        console.log(item)
         const $field = $(`#issue-modal-${item.field}`);
         $field.parent().append(`
             <p class="issue-modal-message text-danger mt-3">
@@ -196,7 +193,6 @@ function deleteIssue(id) {
                     'X-CSRF-TOKEN': token
                 },
                 success: function (response) {
-                    console.log('item deleted', response);
                     deleteRow(response)
                 },
                 error: function (response) {
@@ -206,7 +202,6 @@ function deleteIssue(id) {
         } catch (e) {
             console.error(e);
         }
-        console.log("deleteIssue")
     }
 }
 
