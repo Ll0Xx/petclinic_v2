@@ -19,6 +19,7 @@ import javax.transaction.Transactional;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,6 +46,7 @@ public class LoginIntegrationTests {
                         .post("/process_register")
                         .contentType(APPLICATION_JSON)
                         .content(TestUtils.asJsonString(dto))
+                        .with(csrf())
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -64,6 +66,7 @@ public class LoginIntegrationTests {
                         .post("/process_register")
                         .contentType(APPLICATION_JSON)
                         .content(TestUtils.asJsonString(dto))
+                        .with(csrf())
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -87,6 +90,7 @@ public class LoginIntegrationTests {
                         .post("/process_register")
                         .contentType(APPLICATION_JSON)
                         .content(TestUtils.asJsonString(dto))
+                        .with(csrf())
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -108,6 +112,7 @@ public class LoginIntegrationTests {
                         .post("/process_register")
                         .contentType(APPLICATION_JSON)
                         .content(TestUtils.asJsonString(dto))
+                        .with(csrf())
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())

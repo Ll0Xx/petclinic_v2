@@ -25,11 +25,6 @@ import java.util.stream.Collectors;
 @Service
 public class PetService {
 
-    private static final Integer DEFAULT_PAGE_SIZE = 5;
-    private static final Integer DEFAULT_START_PAGE = 0;
-    private static final String DEFAULT_SORT = "id";
-    private static final String DEFAULT_DIRECTION = "asc";
-
     Logger log = LoggerFactory.getLogger(PetService.class);
 
     private final UserService userService;

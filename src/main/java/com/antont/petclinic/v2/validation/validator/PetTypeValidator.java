@@ -24,6 +24,9 @@ public class PetTypeValidator implements ConstraintValidator<PetType, BigInteger
 
     @Override
     public boolean isValid(BigInteger value, ConstraintValidatorContext context) {
+        if(value == null){
+            return false;
+        }
         return petTypeRepository.existsById(value);
     }
 }

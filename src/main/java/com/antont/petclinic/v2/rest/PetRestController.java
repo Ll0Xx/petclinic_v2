@@ -31,7 +31,7 @@ public class PetRestController {
     }
 
     @PostMapping(path = "/user/pet/create")
-    public ValidationResult update(@ModelAttribute @Valid PetDto dto, BindingResult bindingResult) {
+    public ValidationResult update(@RequestBody @Valid PetDto dto, BindingResult bindingResult) {
         ValidationResult result = new ValidationResult();
         if(bindingResult.hasErrors()){
             result.setSuccess(false);
