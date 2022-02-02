@@ -1,5 +1,13 @@
+.asc{
+    white-space: nowrap;
+}
+
 .asc::after{
     content: ' ^';
+}
+
+.desc{
+    white-space: nowrap;
 }
 
 .desc::after{

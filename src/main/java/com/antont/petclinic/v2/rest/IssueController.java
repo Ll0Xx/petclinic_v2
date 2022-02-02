@@ -35,6 +35,14 @@ public class IssueController {
         return issueService.getPagedForUser(page, size, sort, direction);
     }
 
+    @GetMapping(path = "/doctor/issue")
+    public Page<Issue> getPagedIssuesForDoctor(@RequestParam("page") Optional<Integer> page,
+                                             @RequestParam("size") Optional<Integer> size,
+                                             @RequestParam("sort") Optional<String> sort,
+                                             @RequestParam("dir") Optional<String> direction) {
+        return issueService.getPagedForDoctor(page, size, sort, direction);
+    }
+
     @PostMapping(path = "/doctor/issue/create")
     public ValidationResult update(@Valid @ModelAttribute IssueDto dto, BindingResult bindingResult) {
        ValidationResult result = new ValidationResult();

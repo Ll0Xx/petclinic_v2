@@ -117,7 +117,6 @@ function loadContent(table, page, size, sort, direction){
             },
             error: function (response) {
                 console.error(response);
-                $('#petModal').modal('toggle');
             }
         });
     } catch (e) {

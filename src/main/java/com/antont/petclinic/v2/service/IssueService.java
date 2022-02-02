@@ -102,4 +102,8 @@ public class IssueService {
     public Page<Issue> getPagedForUser(Optional<Integer> page, Optional<Integer> size, Optional<String> sort, Optional<String> direction) {
         return issueRepository.findAllByPetOwner(userService.getLoggedInUser(), PageableUtils.getPageable(page, size, sort, direction));
     }
+
+    public Page<Issue> getPagedForDoctor(Optional<Integer> page, Optional<Integer> size, Optional<String> sort, Optional<String> direction) {
+        return issueRepository.findAll(PageableUtils.getPageable(page, size, sort, direction));
+    }
 }
