@@ -19,8 +19,8 @@ $('#issueModal').on('show.bs.modal', function (event) {
 });
 
 $(document).ready(function () {
-    loadContent('issue', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, addRow)
-    prepareTableHeaders('issue', ['id', 'doctor', 'doctorDoctorSpecialization', 'petName', 'description'], addRow);
+    loadContent('issue', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, loadContentSuccess)
+    prepareTableHeaders('issue', ['id', 'doctor', 'doctorDoctorSpecialization', 'petName', 'description'], loadContentSuccess);
 
     const $form = $('#issueForm');
     $form.on('submit', function (e) {
@@ -55,6 +55,15 @@ $(document).ready(function () {
     })
 })
 
+function loadContentSuccess(table, items){
+    items.forEach(item => {
+        addRow(table, item)
+    })
+    $('.issue-table-delete').click(function () {
+        deleteIssue($(this).attr('data-bs-id'));
+    });
+}
+
 function addRow(table, issue) {
     const $table = $('#doctorTable tbody');
     $table.append(
@@ -70,8 +79,7 @@ function addRow(table, issue) {
                     data-bs-target="#issueModal">
                     Edit
                 </button>
-                <button type="button" class="btn btn-danger" data-bs-id=${issue.id}
-                        onclick="deleteIssue('${issue.id}')">
+                <button type="button" class="issue-table-delete btn btn-danger" data-bs-id='${issue.id}'>
                     Delete
                 </button>
             </td>

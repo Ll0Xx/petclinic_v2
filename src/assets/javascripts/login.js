@@ -45,7 +45,7 @@ $(document).ready(function (){
                 success: function (response) {
                     if (response.success){
                         $(`[href="#tabs-tabs-1"]`).tab('show');
-                        showToast();
+                        showToast('Registration completed successfully!');
                     }else{
                         createErrorFields(response);
                     }
@@ -58,15 +58,6 @@ $(document).ready(function (){
             console.error(e);
         }
     })
-
-    function showToast(){
-        const options = {
-            settings: {
-                duration: 2000,
-            }
-        };
-        iqwerty.toast.toast('Registration completed successfully!', options);
-    }
 
     function createErrorFields(response) {
         response.errors.forEach(item => {

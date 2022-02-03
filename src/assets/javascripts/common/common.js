@@ -1,3 +1,5 @@
+//= require toast.min.js
+
 const DEFAULT_PAGE_SIZE = 5;
 const DEFAULT_START_PAGE = 0;
 const DEFAULT_SORT_FIELD = 'id';
@@ -46,9 +48,7 @@ function loadContent(table, page, size, sort, direction, loadContentSuccess){
             success: function (response) {
                 $(`.${table}-table-element`).remove();
                 $(`.${table}-table-control`).remove();
-                response.content.forEach(item => {
-                    loadContentSuccess(table, item)
-                })
+                loadContentSuccess(table, response.content);
                 if(response.totalPages > 1){
                     let list = $('<ul/>').addClass(`${table}-table-control list-group flex-wrap list-group-horizontal`);
                     for (let i = 0; i < response.totalPages; i++) {
@@ -75,4 +75,13 @@ function loadContent(table, page, size, sort, direction, loadContentSuccess){
     } catch (e) {
         console.error(e);
     }
+}
+
+function showToast(message){
+    const options = {
+        settings: {
+            duration: 2000,
+        }
+    };
+    iqwerty.toast.toast(message, options);
 }

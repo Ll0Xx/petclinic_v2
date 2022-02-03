@@ -6,7 +6,6 @@ $('#petModal').on('show.bs.modal', function (event) {
     $('#pet-modal-name').val(name);
     const type = event.relatedTarget.getAttribute('data-bs-type');
     $('#pet-modal-petType').val(type);
-    console.log(id);
     if (id) {
         $('<input>').attr({
             type: 'hidden',
@@ -56,11 +55,19 @@ $(document).ready(function () {
     })
 })
 
-function loadContentSuccess(table, item){
-    if (table === 'pet') {
-        addRow(item)
-    } else {
-        addIssueRow(item)
+function loadContentSuccess(table, items){
+    items.forEach(item => {
+        if (table === 'pet') {
+            addRow(item)
+        } else {
+            addIssueRow(item)
+        }
+    })
+
+    if(table === 'pet'){
+        $('.pet-table-delete').click(function () {
+            deletePet($(this).attr('data-bs-id'));
+        });
     }
 }
 
@@ -93,8 +100,7 @@ function addRow(pet) {
                     data-bs-type='${pet.petType.id}' data-bs-toggle='modal' data-bs-target='#petModal'>
                         Edit
                 </button>
-                <button type="button" class="btn btn-danger" th:attr="data-bs-id=${pet.id}"
-                    onclick="deletePet(${pet.id})">
+                <button type="button" class="pet-table-delete btn btn-danger" data-bs-id='${pet.id}'>
                         delete
                 </button>
             </td>
@@ -143,10 +149,10 @@ function deletePet(id) {
                     'X-CSRF-TOKEN': token
                 },
                 success: function (response) {
-                    console.log('item deleted', response);
                     deletePetTableRow(response)
                 },
                 error: function (response) {
+                    showToast(response.responseJSON.message)
                     console.error(response);
                 }
             });

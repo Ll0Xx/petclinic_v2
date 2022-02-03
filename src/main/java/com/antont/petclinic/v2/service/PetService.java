@@ -82,7 +82,13 @@ public class PetService {
     }
 
     public BigInteger deletePet(BigInteger id) {
-        return findPetByIdForCurrentUser(id, petRepository::delete).getId();
+        return findPetByIdForCurrentUser(id, pet -> {
+            try {
+                petRepository.delete(pet);
+            } catch (Exception e){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to delete pet, maybe it's already added to the some issue");
+            }
+        } ).getId();
     }
 
     public List<PetType> getPetTypes(){
