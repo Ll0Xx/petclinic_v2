@@ -1,17 +1,14 @@
 package com.antont.petclinic.v2.integration;
 
-import com.antont.petclinic.v2.TestUtils;
 import com.antont.petclinic.v2.auth.dto.CreateUserDto;
+import com.antont.petclinic.v2.db.entity.User;
 import com.antont.petclinic.v2.db.repository.UserRepository;
+import com.antont.petclinic.v2.integration.base.BaseIntegrationTest;
+import com.antont.petclinic.v2.integration.utils.TestUtils;
 import com.antont.petclinic.v2.service.AuthService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -23,12 +20,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class LoginIntegrationTests {
-    @Autowired
-    private MockMvc mockMvc;
+public class LoginIntegrationTests extends BaseIntegrationTest {
 
     @Autowired
     private AuthService authService;
@@ -53,6 +45,22 @@ public class LoginIntegrationTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(false))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors", hasSize(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors[*].field").value("email"));
+
+    }
+
+    @Test
+    void createNewUserWithoutCsrf_shouldFail() throws Exception {
+        CreateUserDto dto = new CreateUserDto();
+        dto.setEmail("email@mail.com");
+        dto.setPassword("Aaa12#aa"); // valid password
+        dto.setConfirmPassword("Aaa12#aa"); // valid password
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/process_register")
+                        .contentType(APPLICATION_JSON)
+                        .content(TestUtils.asJsonString(dto))
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isForbidden());
 
     }
 
@@ -84,30 +92,6 @@ public class LoginIntegrationTests {
         dto.setPassword("Aaa12#aa"); // valid password
         dto.setConfirmPassword("Aaa12#aa"); // valid password
 
-        authService.create(dto);
-
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/process_register")
-                        .contentType(APPLICATION_JSON)
-                        .content(TestUtils.asJsonString(dto))
-                        .with(csrf())
-                        .accept(APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(false))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errors", hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].field").value("email"));
-
-        Assertions.assertTrue(userRepository.findByEmail(dto.getEmail()).isPresent());
-    }
-
-    @Test
-    @Transactional
-    void createNewUserWithDuplicateEmail() throws Exception {
-        CreateUserDto dto = new CreateUserDto();
-        dto.setEmail("email@mail.com");
-        dto.setPassword("Aaa12#aa"); // valid password
-        dto.setConfirmPassword("Aaa12#aa"); // valid password
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/process_register")
                         .contentType(APPLICATION_JSON)
@@ -119,6 +103,27 @@ public class LoginIntegrationTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(true));
 
         Assertions.assertTrue(userRepository.findByEmail(dto.getEmail()).isPresent());
+    }
 
+    @Test
+    @Transactional
+    void createNewUserWithDuplicateEmail() throws Exception {
+        User user = testUtils.initTestUser("email@mail.com", false);
+
+        CreateUserDto dto = new CreateUserDto();
+        dto.setEmail(user.getEmail());
+        dto.setPassword("Aaa12#aa"); // valid password
+        dto.setConfirmPassword("Aaa12#aa"); // valid password
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/process_register")
+                        .contentType(APPLICATION_JSON)
+                        .content(TestUtils.asJsonString(dto))
+                        .with(csrf())
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(false))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors", hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[*].field", contains("email")));
     }
 }

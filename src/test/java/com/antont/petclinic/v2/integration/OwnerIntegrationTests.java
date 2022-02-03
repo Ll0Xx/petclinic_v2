@@ -1,18 +1,14 @@
 package com.antont.petclinic.v2.integration;
 
-import com.antont.petclinic.v2.TestUtils;
 import com.antont.petclinic.v2.db.entity.Pet;
 import com.antont.petclinic.v2.db.entity.PetType;
 import com.antont.petclinic.v2.db.entity.User;
 import com.antont.petclinic.v2.db.repository.PetTypeRepository;
 import com.antont.petclinic.v2.dto.PetDto;
+import com.antont.petclinic.v2.integration.base.BaseIntegrationTest;
+import com.antont.petclinic.v2.integration.utils.TestUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,19 +23,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-public class OwnerIntegrationTests {
-
-    @Autowired
-    private MockMvc mockMvc;
+public class OwnerIntegrationTests extends BaseIntegrationTest {
 
     @Autowired
     private PetTypeRepository petTypeRepository;
-
-    @Autowired
-    private TestUtils testUtils;
 
     @Test
     @Transactional
@@ -48,7 +35,7 @@ public class OwnerIntegrationTests {
         dto.setName("new pet");
         dto.setPetType(testUtils.initTestPetType().getId());
 
-        User user = testUtils.initTestUser();
+        User user = testUtils.initTestUser("email@mail.com", false);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/user/pet/create")
@@ -66,8 +53,28 @@ public class OwnerIntegrationTests {
 
     @Test
     @Transactional
+    public void createNewPetWithoutCsrf_shouldFail() throws Exception {
+        PetDto dto = new PetDto();
+        dto.setName("new pet");
+        dto.setPetType(testUtils.initTestPetType().getId());
+
+        User user = testUtils.initTestUser("email@mail.com", false);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/user/pet/create")
+                        .contentType(APPLICATION_JSON)
+                        .with(user(user.getEmail()).roles("USER"))
+                        .content(TestUtils.asJsonString(dto))
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Transactional
     public void updatePet_shouldSuccess() throws Exception {
-        Pet pet = testUtils.initTestPet();
+        String userMail = "email@mail.com";
+        Pet pet = testUtils.initTestPet(userMail);
 
         PetType type = new PetType();
         type.setName("new test type");
@@ -78,7 +85,7 @@ public class OwnerIntegrationTests {
         dto.setName("edited pet name");
         dto.setPetType(petType.getId());
 
-        User user = testUtils.initTestUser();
+        User user = testUtils.initTestUser(userMail, false);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/user/pet/create")
@@ -98,8 +105,9 @@ public class OwnerIntegrationTests {
     @Test
     @Transactional
     public void deletePet_shouldSuccess() throws Exception {
-        Pet pet = testUtils.initTestPet();
-        User user = testUtils.initTestUser();
+        String userEmail = "email@mail.com";
+        Pet pet = testUtils.initTestPet(userEmail);
+        User user = testUtils.initTestUser(userEmail, false);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/user/pet/delete/" + pet.getId())
@@ -119,7 +127,7 @@ public class OwnerIntegrationTests {
         dto.setName("a"); // invalid name
         dto.setPetType(BigInteger.valueOf(-1)); // invalid
 
-        User user = testUtils.initTestUser();
+        User user = testUtils.initTestUser("email@mail.com", false);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/user/pet/create")
@@ -138,7 +146,7 @@ public class OwnerIntegrationTests {
     @Test
     @Transactional
     public void updatePet_shouldFail() throws Exception {
-        Pet pet = testUtils.initTestPet();
+        Pet pet = testUtils.initTestPet("email@mail.com");
 
         PetType type = new PetType();
         type.setName("new test type");
@@ -163,7 +171,7 @@ public class OwnerIntegrationTests {
     @Test
     @Transactional
     public void deletePet_shouldFail() throws Exception {
-        Pet pet = testUtils.initTestPet();
+        Pet pet = testUtils.initTestPet("email@mail.com");
 
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/user/pet/delete/" + pet.getId())

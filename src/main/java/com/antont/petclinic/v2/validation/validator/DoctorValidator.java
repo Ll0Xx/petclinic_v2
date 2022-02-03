@@ -22,6 +22,9 @@ public class DoctorValidator implements ConstraintValidator<Doctor, BigInteger> 
 
     @Override
     public boolean isValid(BigInteger value, ConstraintValidatorContext context) {
+        if(value == null){
+            return false;
+        }
         return doctorRepository.existsById(value);
     }
 }

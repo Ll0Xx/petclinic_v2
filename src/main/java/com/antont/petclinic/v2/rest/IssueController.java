@@ -44,7 +44,7 @@ public class IssueController {
     }
 
     @PostMapping(path = "/doctor/issue/create")
-    public ValidationResult update(@Valid @ModelAttribute IssueDto dto, BindingResult bindingResult) {
+    public ValidationResult update(@Valid @RequestBody IssueDto dto, BindingResult bindingResult) {
        ValidationResult result = new ValidationResult();
         if(bindingResult.hasErrors()){
             result.setSuccess(false);
