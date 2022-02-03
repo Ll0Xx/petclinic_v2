@@ -1,10 +1,4 @@
-const DEFAULT_PAGE_SIZE = 5;
-const DEFAULT_START_PAGE = 0;
-const DEFAULT_SORT_FIELD = 'id';
-const DEFAULT_DIRECTION = 'asc';
-let currentPage = DEFAULT_START_PAGE;
-let currentSortField = DEFAULT_SORT_FIELD;
-let currentSortDir = DEFAULT_DIRECTION;
+//= require common/common.js
 
 $('#petModal').on('show.bs.modal', function (event) {
     const id = event.relatedTarget.getAttribute('data-bs-id');
@@ -24,18 +18,11 @@ $('#petModal').on('show.bs.modal', function (event) {
 });
 
 $(document).ready(function () {
-    loadContent('pet', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION);
-    loadContent('issue', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION);
+    loadContent('pet', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, loadContentSuccess);
+    loadContent('issue', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, loadContentSuccess);
 
-    prepareTableHeader('pet', 'id');
-    prepareTableHeader('pet', 'name');
-    prepareTableHeader('pet', 'petType');
-
-    prepareTableHeader('issue', 'id');
-    prepareTableHeader('issue', 'doctor');
-    prepareTableHeader('issue', 'doctorDoctorSpecialization');
-    prepareTableHeader('issue', 'petName');
-    prepareTableHeader('issue', 'description');
+    prepareTableHeaders('pet', ['id', 'name', 'petType'], loadContentSuccess);
+    prepareTableHeaders('issue', ['id', 'doctor', 'doctorDoctorSpecialization', 'petName', 'description'], loadContentSuccess);
 
     const $form = $('#petForm');
     $form.on('submit', function (e) {
@@ -44,8 +31,12 @@ $(document).ready(function () {
         try {
             $.ajax({
                 url: $form.attr('action'),
+                contentType: 'application/json',
                 type: 'post',
-                data: $form.serialize(),
+                headers: {
+                    'X-CSRF-TOKEN': token
+                },
+                data:JSON.stringify(toJsonObject($form.serializeArray())),
                 success: function (response) {
                     if(response.success === true){
                         $('#petModal').modal('toggle');
@@ -65,62 +56,11 @@ $(document).ready(function () {
     })
 })
 
-function prepareTableHeader(table, id){
-    $(`#${table}-table-${id}`).click(function () {
-        $(".asc").not(this).removeClass('asc')
-        $(".desc").not(this).removeClass('desc')
-        const dir = !$(this).hasClass('asc') && !$(this).hasClass('desc') ? 'asc' : $(this).hasClass('asc')? 'desc' : 'asc';
-        loadContent(table, currentPage, DEFAULT_PAGE_SIZE, id, dir);
-        if (!$(this).hasClass('asc') && !$(this).hasClass('desc')) {
-            $(this).toggleClass('asc');
-        } else {
-            $(this).toggleClass('asc');
-            $(this).toggleClass('desc');
-        }
-    })
-}
-
-function loadContent(table, page, size, sort, direction){
-    currentPage = page;
-    currentSortField = sort;
-    currentSortDir = direction;
-    try {
-        $.ajax({
-            url: `${window.location}/${table}?page=${page}&size=${size}&sort=${sort}&dir=${direction}`,
-            type: 'get',
-            success: function (response) {
-                $(`.${table}-table-element`).remove();
-                $(`.${table}-table-control`).remove();
-                response.content.forEach(item => {
-                    if (table === 'pet') {
-                        addRow(item)
-                    } else {
-                        addIssueRow(item)
-                    }
-                })
-                if(response.totalPages > 1){
-                    let list = $('<ul/>').addClass(`${table}-table-control list-group list-group-horizontal`);
-                    for (let i = 0; i < response.totalPages; i++) {
-                        const li = $('<li/>')
-                            .addClass('m-1')
-                            .css('list-style', 'none')
-                            .appendTo(list);
-                        $('<button/>')
-                            .text(i)
-                            .addClass(`btn btn-${page === i ?  'light' : 'primary'}`)
-                            .click(function () { loadContent(table, i, DEFAULT_PAGE_SIZE, currentSortField, currentSortDir) })
-                            .appendTo(li);
-                    }
-
-                    list.appendTo($(`#${table}ListContainer`));
-                }
-            },
-            error: function (response) {
-                console.error(response);
-            }
-        });
-    } catch (e) {
-        console.error(e);
+function loadContentSuccess(table, item){
+    if (table === 'pet') {
+        addRow(item)
+    } else {
+        addIssueRow(item)
     }
 }
 

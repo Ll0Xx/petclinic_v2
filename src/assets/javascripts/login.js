@@ -1,3 +1,5 @@
+//= require common/common.js
+
 $(document).ready(function (){
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
@@ -31,7 +33,6 @@ $(document).ready(function (){
     $form.on('submit', function (e) {
         deleteErrorMessages();
         e.preventDefault();
-        const token = $("meta[name='_csrf']").attr("content");
         try {
             $.ajax({
                 url: $form.attr('action'),
@@ -92,11 +93,3 @@ $(document).ready(function (){
         console.log('Delete all error messages');
     }
 })
-
-function toJsonObject(formArray) {
-    const returnArray = {};
-    for (let i = 0; i < formArray.length; i++){
-        returnArray[formArray[i]['name']] = formArray[i]['value'];
-    }
-    return returnArray;
-}

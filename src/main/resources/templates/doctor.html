@@ -9,7 +9,7 @@
 <header th:replace="_fragments.html :: header"></header>
 <div class="col-10 mx-auto" id="issuesTable">
     <div>
-        <div id="doctorListContainer" th:classappend="${issuesList.isEmpty()} ? 'd-none' : ''">
+        <div id="issueListContainer" th:classappend="${issuesList.isEmpty()} ? 'd-none' : ''">
             <div class="text-center my-3">
                 <span> List of issues, click the button to add more </span>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#issueModal">
@@ -19,11 +19,11 @@
             <table id="doctorTable" class="table table-striped">
                 <thead>
                 <tr class="fw-bold text-nowrap">
-                    <td id="doctor-table-id" class="asc">Id</td>
-                    <td id="doctor-table-doctor">Doctor</td>
-                    <td id="doctor-table-doctorDoctorSpecialization">Doctor specialization</td>
-                    <td id="doctor-table-petName">Pet name</td>
-                    <td id="doctor-table-description">Issue description</td>
+                    <td id="issue-table-id" class="asc">Id</td>
+                    <td id="issue-table-doctor">Doctor</td>
+                    <td id="issue-table-doctorDoctorSpecialization">Doctor specialization</td>
+                    <td id="issue-table-petName">Pet name</td>
+                    <td id="issue-table-description">Issue description</td>
                     <td></td>
                 </tr>
                 </thead>

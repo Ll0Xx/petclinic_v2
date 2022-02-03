@@ -1,10 +1,4 @@
-const DEFAULT_PAGE_SIZE = 5;
-const DEFAULT_START_PAGE = 0;
-const DEFAULT_SORT_FIELD = 'id';
-const DEFAULT_DIRECTION = 'asc';
-let currentPage = DEFAULT_START_PAGE;
-let currentSortField = DEFAULT_SORT_FIELD;
-let currentSortDir = DEFAULT_DIRECTION;
+//= require common/common.js
 
 $('#issueModal').on('show.bs.modal', function (event) {
     const id = event.relatedTarget.getAttribute('data-bs-id');
@@ -25,13 +19,8 @@ $('#issueModal').on('show.bs.modal', function (event) {
 });
 
 $(document).ready(function () {
-    loadContent(DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION)
-
-    prepareTableHeader('id');
-    prepareTableHeader('doctor');
-    prepareTableHeader('doctorDoctorSpecialization');
-    prepareTableHeader('petName');
-    prepareTableHeader('description');
+    loadContent('issue', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, addRow)
+    prepareTableHeaders('issue', ['id', 'doctor', 'doctorDoctorSpecialization', 'petName', 'description'], addRow);
 
     const $form = $('#issueForm');
     $form.on('submit', function (e) {
@@ -42,10 +31,11 @@ $(document).ready(function () {
             $.ajax({
                 url: $form.attr('action'),
                 type: 'post',
+                contentType: 'application/json',
                 headers: {
                     'X-CSRF-TOKEN': token
                 },
-                data: $form.serialize(),
+                data: JSON.stringify(toJsonObject($form.serializeArray())),
                 success: function (response) {
                     if(response.success){
                         $('#issueModal').modal('toggle');
@@ -65,66 +55,10 @@ $(document).ready(function () {
     })
 })
 
-function loadContent(page, size, sort, direction){
-    currentPage = page;
-    currentSortField = sort;
-    currentSortDir = direction;
-    try {
-        $.ajax({
-            url: `${window.location}/issue?page=${page}&size=${size}&sort=${sort}&dir=${direction}`,
-            type: 'get',
-            success: function (response) {
-                $('.doctor-table-element').remove();
-                $('.doctor-table-control').remove();
-                response.content.forEach(item => {
-                        addRow(item)
-                })
-                if(response.totalPages > 1){
-                    let list = $('<ul/>')
-                        .addClass(`doctor-table-control list-group flex-wrap list-group-horizontal`);
-                    for (let i = 0; i < response.totalPages; i++) {
-                        const li = $('<li/>')
-                            .addClass('m-1')
-                            .css('list-style', 'none')
-                            .appendTo(list);
-                        $('<button/>')
-                            .text(i)
-                            .addClass(`btn btn-${page === i ?  'light' : 'primary'}`)
-                            .click(function () { loadContent(i, DEFAULT_PAGE_SIZE, currentSortField, currentSortDir) })
-                            .appendTo(li);
-                    }
-
-                    list.appendTo($(`#doctorListContainer`));
-                }
-            },
-            error: function (response) {
-                console.error(response);
-            }
-        });
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-function prepareTableHeader(id){
-    $(`#doctor-table-${id}`).click(function () {
-        $(".asc").not(this).removeClass('asc')
-        $(".desc").not(this).removeClass('desc')
-        const dir = !$(this).hasClass('asc') && !$(this).hasClass('desc') ? 'asc' : $(this).hasClass('asc')? 'desc' : 'asc';
-        loadContent(currentPage, DEFAULT_PAGE_SIZE, id, dir);
-        if (!$(this).hasClass('asc') && !$(this).hasClass('desc')) {
-            $(this).toggleClass('asc');
-        } else {
-            $(this).toggleClass('asc');
-            $(this).toggleClass('desc');
-        }
-    })
-}
-
-function addRow(issue) {
+function addRow(table, issue) {
     const $table = $('#doctorTable tbody');
     $table.append(
-        `<tr class="doctor-table-element">
+        `<tr class="${table}-table-element">
             <td>${issue.id}</td>
             <td class="issue-doctor">${issue.doctor.user.email}</td>
             <td class="issue-doctorSpecialization">${issue.doctor.doctorSpecialization.name}</td>
