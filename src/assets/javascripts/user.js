@@ -39,7 +39,7 @@ $(document).ready(function () {
                 success: function (response) {
                     if(response.success === true){
                         $('#petModal').modal('toggle');
-                        updatePetTable(response.result)
+                        loadLastPage()
                     }else{
                         createErrorFields(response);
                     }
@@ -63,11 +63,29 @@ function loadContentSuccess(table, items){
             addIssueRow(item)
         }
     })
+}
 
-    if(table === 'pet'){
-        $('.pet-table-delete').click(function () {
-            deletePet($(this).attr('data-bs-id'));
+function loadLastPage(){
+    try {
+        $.ajax({
+            url: `${window.location}/pet/latest`,
+            contentType: 'application/json',
+            type: 'get',
+            headers: {
+                'X-CSRF-TOKEN': token
+            },
+            success: function (response) {
+                console.log(response);
+                response.content.forEach(item => {
+                    updatePetTable(item)
+                })
+            },
+            error: function (response) {
+                console.error(response);
+            }
         });
+    } catch (e) {
+        console.error(e);
     }
 }
 
@@ -89,47 +107,37 @@ function updatePetTable(pet) {
 }
 
 function addRow(pet) {
-    const $table = $('#petsTable tbody');
-    $table.append(
-        `<tr class="pet-table-element">
-            <td class="pet-id">${pet.id}</td>
-            <td class="pet-name">${pet.name}</td>
-            <td class="pet-type">${pet.petType.name}</td>
-            <td>
-                <button type="button" class="btn btn-primary" data-bs-id='${pet.id}' data-bs-name='${pet.name}'
-                    data-bs-type='${pet.petType.id}' data-bs-toggle='modal' data-bs-target='#petModal'>
-                        Edit
-                </button>
-                <button type="button" class="pet-table-delete btn btn-danger" data-bs-id='${pet.id}'>
-                        delete
-                </button>
-            </td>
-        </tr>`
-    )
+    $("#petsTable").find('tbody')
+        .append($('<tr>')
+            .addClass('pet-table-element')
+            .append($('<td>').addClass('pet-id').text(pet.id))
+            .append($('<td>').addClass('pet-name').text(pet.name))
+            .append($('<td>').addClass('pet-type').text(pet.petType.name))
+            .append($('<td>')
+                .append($('<button>').text('edit').addClass('btn btn-primary').attr('data-bs-id',pet.id)
+                    .attr('data-bs-name',pet.name).attr('data-bs-type',pet.petType.id).attr('data-bs-toggle', 'modal')
+                    .attr('data-bs-target','#petModal'))
+                .append($('<button>').text('delete').addClass('pet-table-delete btn btn-danger')
+                .attr('data-bs-id', pet.id).click(function () { deletePet(pet.id) })))
+        );
 }
 
 function addIssueRow(issue) {
-    const $table = $('#issuesTable tbody');
-    $table.append(
-        `<tr class="issue-table-element">
-            <td>${issue.id}</td>
-            <td>${issue.doctor.user.email}</td>
-            <td>${issue.doctor.doctorSpecialization.name}</td>
-            <td>${issue.pet.name}</td>
-            <td>${issue.description}</td>
-        </tr>`
-    )
+    $("#issuesTable").find('tbody')
+        .append($('<tr>')
+            .addClass('issue-table-element')
+            .append($('<td>').text(issue.id))
+            .append($('<td>').text(issue.doctor.user.email))
+            .append($('<td>').text(issue.doctor.doctorSpecialization.name))
+            .append($('<td>').text(issue.pet.name))
+            .append($('<td>').text(issue.description)))
+
 }
 
 function createErrorFields(response) {
     response.errors.forEach(item => {
-        console.log(item)
         const $field = $(`#pet-modal-${item.field}`);
-        $field.parent().append(`
-            <p class="pet-modal-message text-danger mt-3">
-                ${item.defaultMessage}
-            </p>
-        `);
+        $field.parent().append($('<p>').addClass('pet-modal-message text-danger mt-3').text(item.defaultMessage));
         $field.addClass('is-invalid')
     })
 }
@@ -139,7 +147,6 @@ function deleteErrorMessages(){
 }
 
 function deletePet(id) {
-    const token = $("meta[name='_csrf']").attr("content");
     if (confirm('Do you want to remove this pet from the database??')) {
         try {
             $.ajax({
@@ -167,7 +174,7 @@ function deletePetTableRow(id){
     $row.remove();
     const $table = $('#petsTable tbody');
     if ($table.children().length <= 0) {
-        $('#petsListContainer').addClass('d-none');
+        $('#petListContainer').addClass('d-none');
         $('#noPetsMessageContainer').removeClass('d-none');
     }
 }

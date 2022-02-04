@@ -30,6 +30,11 @@ public class PetRestController {
         return petService.getPetsPaged(page, size, sort, direction);
     }
 
+    @GetMapping(path = "/user/pet/latest")
+    public Page<Pet> getPetsPaged(){
+        return petService.getPetsLastPage();
+    }
+
     @PostMapping(path = "/user/pet/create")
     public ValidationResult update(@RequestBody @Valid PetDto dto, BindingResult bindingResult) {
         ValidationResult result = new ValidationResult();

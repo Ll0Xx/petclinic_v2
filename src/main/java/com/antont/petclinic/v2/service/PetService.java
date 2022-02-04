@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -104,6 +104,12 @@ public class PetService {
 
     public Page<Pet> getPetsPaged(Optional<Integer> page, Optional<Integer> size, Optional<String> sort, Optional<String> direction) {
         return petRepository.findAllByOwner(userService.getLoggedInUser(), PageableUtils.getPageable(page, size, sort, direction));
+    }
+
+    public Page<Pet> getPetsLastPage() {
+        Page<Pet> petPage =  petRepository.findAllByOwner(userService.getLoggedInUser(), Pageable.ofSize(PageableUtils.DEFAULT_PAGE_SIZE));
+        int pageCount = petPage.getTotalPages() - 1;
+        return petRepository.findAllByOwner(userService.getLoggedInUser(),  PageRequest.of(pageCount, PageableUtils.DEFAULT_PAGE_SIZE));
     }
 
     public List<Pet> getPets() {

@@ -7,10 +7,10 @@ import org.springframework.data.domain.Sort;
 import java.util.Optional;
 
 public class PageableUtils {
-    private static final Integer DEFAULT_START_PAGE = 0;
-    private static final Integer DEFAULT_PAGE_SIZE = 5;
-    private static final String DEFAULT_SORT = "id";
-    private static final String DEFAULT_DIRECTION = "asc";
+    public static final Integer DEFAULT_START_PAGE = 0;
+    public static final Integer DEFAULT_PAGE_SIZE = 5;
+    public static final String DEFAULT_SORT = "id";
+    public static final String DEFAULT_DIRECTION = "asc";
 
     public static Pageable getPageable(Optional<Integer> page, Optional<Integer> size, Optional<String> sort, Optional<String> direction){
         Integer p = page.orElse(DEFAULT_START_PAGE);

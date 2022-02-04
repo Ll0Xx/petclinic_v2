@@ -26,7 +26,6 @@ $(document).ready(function () {
     $form.on('submit', function (e) {
         deleteErrorMessages()
         e.preventDefault();
-        const token = $("meta[name='_csrf']").attr("content");
         try {
             $.ajax({
                 url: $form.attr('action'),
@@ -95,7 +94,7 @@ function updateIssueTable(issue) {
             $('#issuesTableContainer').removeClass('d-none');
             $('#issuesListEmptyContainer').addClass('d-none');
         }
-        addRow(issue)
+        addRow('issue', issue)
     } else {
         $row.find('.issue-doctor').text(issue.doctor.user.email);
         $row.find('.issue-doctorSpecialization').text(issue.doctor.doctorSpecialization.name);
@@ -125,7 +124,6 @@ function deleteErrorMessages(){
 }
 
 function deleteIssue(id) {
-    const token = $("meta[name='_csrf']").attr("content");
     if (confirm('Do you want to remove this pet from the database??')) {
         try {
             $.ajax({
