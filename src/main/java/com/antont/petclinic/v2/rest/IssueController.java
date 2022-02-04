@@ -43,6 +43,11 @@ public class IssueController {
         return issueService.getPagedForDoctor(page, size, sort, direction);
     }
 
+    @GetMapping(path = "/doctor/issue/last")
+    public Page<Issue> getLastIssuesPageForDoctor() {
+        return issueService.getLastPageForDoctor();
+    }
+
     @PostMapping(path = "/doctor/issue/create")
     public ValidationResult update(@Valid @RequestBody IssueDto dto, BindingResult bindingResult) {
        ValidationResult result = new ValidationResult();
