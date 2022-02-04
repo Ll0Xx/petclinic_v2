@@ -6,10 +6,11 @@ $('#petModal').on('show.bs.modal', function (event) {
     $('#pet-modal-name').val(name);
     const type = event.relatedTarget.getAttribute('data-bs-type');
     $('#pet-modal-petType').val(type);
+    $('#pet-modal-id').remove();
     if (id) {
         $('<input>').attr({
             type: 'hidden',
-            id: 'id',
+            id: 'pet-modal-id',
             name: 'id',
             value: id
         }).appendTo($('#petForm'));
@@ -37,9 +38,15 @@ $(document).ready(function () {
                 },
                 data:JSON.stringify(toJsonObject($form.serializeArray())),
                 success: function (response) {
+                    console.log()
                     if(response.success === true){
+                        console.log(response)
                         $('#petModal').modal('toggle');
-                        loadLastPage()
+                        if($('#pet-modal-id').val()){
+                            updatePetTable(response.result)
+                        } else {
+                            loadLastPage()
+                        }
                     }else{
                         createErrorFields(response);
                     }
@@ -75,10 +82,8 @@ function loadLastPage(){
                 'X-CSRF-TOKEN': token
             },
             success: function (response) {
-                console.log(response);
-                response.content.forEach(item => {
-                    updatePetTable(item)
-                })
+                updatePagingControls(response, 'pet', loadContentSuccess)
+                showTable()
             },
             error: function (response) {
                 console.error(response);
@@ -92,17 +97,21 @@ function loadLastPage(){
 function updatePetTable(pet) {
     const $row = getRow(pet.id);
     if ($row.length <= 0) {
-        const $table = $('#petsTable tbody');
-        if ($table.children().length <= 1) {
-            $('#petListContainer').removeClass('d-none');
-            $('#noPetsMessageContainer').addClass('d-none');
-        }
+        showTable()
         addRow(pet)
     } else {
         $row.find('.pet-name').text(pet.name);
         $row.find('.pet-type').text(pet.petType.name);
         $row.find('.btn-primary').attr('data-bs-name', pet.name);
         $row.find('.btn-primary').attr('data-bs-type', pet.petType.id);
+    }
+}
+
+function showTable(){
+    const $table = $('#petsTable tbody');
+    if ($table.children().length <= 1) {
+        $('#petListContainer').removeClass('d-none');
+        $('#noPetsMessageContainer').addClass('d-none');
     }
 }
 
@@ -114,9 +123,14 @@ function addRow(pet) {
             .append($('<td>').addClass('pet-name').text(pet.name))
             .append($('<td>').addClass('pet-type').text(pet.petType.name))
             .append($('<td>')
-                .append($('<button>').text('edit').addClass('btn btn-primary').attr('data-bs-id',pet.id)
-                    .attr('data-bs-name',pet.name).attr('data-bs-type',pet.petType.id).attr('data-bs-toggle', 'modal')
-                    .attr('data-bs-target','#petModal'))
+                .append($('<button>').text('edit').addClass('btn btn-primary').attr(
+                    {
+                        'data-bs-id': pet.id,
+                        'data-bs-name': pet.name,
+                        'data-bs-type': pet.petType.id,
+                        'data-bs-toggle': 'modal',
+                        'data-bs-target': '#petModal'
+                    }))
                 .append($('<button>').text('delete').addClass('pet-table-delete btn btn-danger')
                 .attr('data-bs-id', pet.id).click(function () { deletePet(pet.id) })))
         );

@@ -46,27 +46,7 @@ function loadContent(table, page, size, sort, direction, loadContentSuccess){
             url: `${window.location}/${table}?page=${page}&size=${size}&sort=${sort}&dir=${direction}`,
             type: 'get',
             success: function (response) {
-                $(`.${table}-table-element`).remove();
-                $(`.${table}-table-control`).remove();
-                loadContentSuccess(table, response.content);
-                if(response.totalPages > 1){
-                    let list = $('<ul/>').addClass(`${table}-table-control list-group flex-wrap list-group-horizontal`);
-                    for (let i = 0; i < response.totalPages; i++) {
-                        const li = $('<li/>')
-                            .addClass('m-1')
-                            .css('list-style', 'none')
-                            .appendTo(list);
-                        $('<button/>')
-                            .text(i)
-                            .addClass(`btn btn-${page === i ?  'light' : 'primary'}`)
-                            .click(function () {
-                                loadContent(table, i, DEFAULT_PAGE_SIZE, currentSortField, currentSortDir, loadContentSuccess)
-                            })
-                            .appendTo(li);
-                    }
-
-                    list.appendTo($(`#${table}ListContainer`));
-                }
+                updatePagingControls(response, table, loadContentSuccess);
             },
             error: function (response) {
                 console.error(response);
@@ -74,6 +54,30 @@ function loadContent(table, page, size, sort, direction, loadContentSuccess){
         });
     } catch (e) {
         console.error(e);
+    }
+}
+
+function updatePagingControls(response, table, loadContentSuccess){
+    $(`.${table}-table-element`).remove();
+    $(`.${table}-table-control`).remove();
+    loadContentSuccess(table, response.content);
+    if(response.totalPages > 1){
+        let list = $('<ul/>').addClass(`${table}-table-control list-group flex-wrap list-group-horizontal`);
+        for (let i = 0; i < response.totalPages; i++) {
+            const li = $('<li/>')
+                .addClass('m-1')
+                .css('list-style', 'none')
+                .appendTo(list);
+            $('<button/>')
+                .text(i)
+                .addClass(`btn btn-${currentPage === i ?  'light' : 'primary'}`)
+                .click(function () {
+                    loadContent(table, i, DEFAULT_PAGE_SIZE, currentSortField, currentSortDir, loadContentSuccess)
+                })
+                .appendTo(li);
+        }
+
+        list.appendTo($(`#${table}ListContainer`));
     }
 }
 
