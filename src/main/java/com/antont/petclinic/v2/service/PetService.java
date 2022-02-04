@@ -37,20 +37,20 @@ public class PetService {
         this.petTypeRepository = petTypeRepository;
     }
 
-    public String getPetsNames(){
+    public String getPetsNames() {
         return getPets().stream()
                 .map(Pet::getName)
                 .collect(Collectors.joining(", "));
     }
 
-    public List<Pet> findByKeyword(String keyword){
+    public List<Pet> findByKeyword(String keyword) {
         return petRepository.findByNameLike("%" + keyword + "%");
     }
 
     public Pet handlePetRequest(PetDto dto) {
         return dto.getId() == null ? savePet(dto) : editPet(dto);
     }
-    
+
     private Pet savePet(PetDto dto) {
         User user = userService.getLoggedInUser();
         Pet pet = new Pet();
@@ -61,7 +61,7 @@ public class PetService {
         return pet;
     }
 
-    private Pet findPetByIdForCurrentUser(BigInteger id, Consumer<Pet> petConsumer){
+    private Pet findPetByIdForCurrentUser(BigInteger id, Consumer<Pet> petConsumer) {
         User user = userService.getLoggedInUser();
         Optional<Pet> pet = petRepository.findByIdAndOwner(id, user);
         return pet.map(pet1 -> {
@@ -69,7 +69,7 @@ public class PetService {
             return pet1;
         }).orElseThrow(() -> {
             log.error("Failed to update, pet with id " + id + " for user " + user.getEmail() + " not found");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to modify/delete pet");
+            throw new RuntimeException("Error while trying to modify/delete pet");
         });
     }
 
@@ -85,20 +85,20 @@ public class PetService {
         return findPetByIdForCurrentUser(id, pet -> {
             try {
                 petRepository.delete(pet);
-            } catch (Exception e){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to delete pet, maybe it's already added to the some issue");
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to delete pet, maybe it's already added to the some issue");
             }
-        } ).getId();
+        }).getId();
     }
 
-    public List<PetType> getPetTypes(){
+    public List<PetType> getPetTypes() {
         return petTypeRepository.findAll();
     }
 
     private PetType getPetType(BigInteger id) {
         return petTypeRepository.findById(id).orElseThrow(() -> {
             log.error("Failed to update, pet type with id " + id + " not found");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pet type with id: " + id + " not found");
+            throw new RuntimeException("Pet type with id: " + id + " not found");
         });
     }
 
@@ -107,9 +107,9 @@ public class PetService {
     }
 
     public Page<Pet> getPetsLastPage() {
-        Page<Pet> petPage =  petRepository.findAllByOwner(userService.getLoggedInUser(), Pageable.ofSize(PageableUtils.DEFAULT_PAGE_SIZE));
+        Page<Pet> petPage = petRepository.findAllByOwner(userService.getLoggedInUser(), Pageable.ofSize(PageableUtils.DEFAULT_PAGE_SIZE));
         int pageCount = petPage.getTotalPages() - 1;
-        return petRepository.findAllByOwner(userService.getLoggedInUser(),  PageRequest.of(pageCount, PageableUtils.DEFAULT_PAGE_SIZE));
+        return petRepository.findAllByOwner(userService.getLoggedInUser(), PageRequest.of(pageCount, PageableUtils.DEFAULT_PAGE_SIZE));
     }
 
     public List<Pet> getPets() {

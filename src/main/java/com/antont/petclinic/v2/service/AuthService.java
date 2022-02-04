@@ -44,7 +44,7 @@ public class AuthService {
         user.setPassword(encodedPassword);
 
         getRoleByName(dto.getDoctor() ? "ROLE_DOCTOR" : "ROLE_USER").ifPresentOrElse(user::setRole, () -> {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while creating user");
+            throw new RuntimeException("Error while creating user");
         });
 
         user = userRepository.save(user);
@@ -57,12 +57,12 @@ public class AuthService {
                 doctorRepository.save(doc);
             }, () -> {
                 log.error("Doctor specialization with id " + dto.getDoctorSpecialization() + " not found");
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while creating doctor");
+                throw new RuntimeException("Error while creating doctor");
             });
         }
     }
 
-    private Optional<Role> getRoleByName(String name){
+    private Optional<Role> getRoleByName(String name) {
         return roleRepository.findByName(name);
     }
 

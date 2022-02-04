@@ -7,9 +7,11 @@ import com.antont.petclinic.v2.service.IssueService;
 import com.antont.petclinic.v2.service.PetService;
 import com.antont.petclinic.v2.validation.ValidationResult;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.math.BigInteger;
@@ -37,9 +39,9 @@ public class IssueController {
 
     @GetMapping(path = "/doctor/issue")
     public Page<Issue> getPagedIssuesForDoctor(@RequestParam("page") Optional<Integer> page,
-                                             @RequestParam("size") Optional<Integer> size,
-                                             @RequestParam("sort") Optional<String> sort,
-                                             @RequestParam("dir") Optional<String> direction) {
+                                               @RequestParam("size") Optional<Integer> size,
+                                               @RequestParam("sort") Optional<String> sort,
+                                               @RequestParam("dir") Optional<String> direction) {
         return issueService.getPagedForDoctor(page, size, sort, direction);
     }
 
@@ -50,24 +52,36 @@ public class IssueController {
 
     @PostMapping(path = "/doctor/issue/create")
     public ValidationResult update(@Valid @RequestBody IssueDto dto, BindingResult bindingResult) {
-       ValidationResult result = new ValidationResult();
-        if(bindingResult.hasErrors()){
-            result.setSuccess(false);
-            result.setErrors(bindingResult.getAllErrors());
-        }else{
-            result.setSuccess(true);
-            result.setResult(issueService.handleIssueRequest(dto));
+        try {
+            ValidationResult result = new ValidationResult();
+            if (bindingResult.hasErrors()) {
+                result.setSuccess(false);
+                result.setErrors(bindingResult.getAllErrors());
+            } else {
+                result.setSuccess(true);
+                result.setResult(issueService.handleIssueRequest(dto));
+            }
+            return result;
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
-        return result;
     }
 
     @DeleteMapping(path = "/doctor/issue/delete/{id}")
     public ResponseEntity<BigInteger> delete(@PathVariable("id") BigInteger id) {
-        return ResponseEntity.ok().body(issueService.delete(id));
+        try {
+            return ResponseEntity.ok().body(issueService.delete(id));
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @GetMapping(path = "/doctor/issue/search")
     public ResponseEntity<List<Pet>> search(@RequestParam String keyword) {
-        return ResponseEntity.ok().body(petService.findByKeyword(keyword));
+        try {
+            return ResponseEntity.ok().body(petService.findByKeyword(keyword));
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 }

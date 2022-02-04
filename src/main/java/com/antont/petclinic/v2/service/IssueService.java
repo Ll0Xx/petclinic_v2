@@ -39,19 +39,19 @@ public class IssueService {
         this.petRepository = petRepository;
     }
 
-    public List<Issue> findIssuesForUser(User user){
+    public List<Issue> findIssuesForUser(User user) {
         return issueRepository.findByPetOwner(user);
     }
 
-    public List<Issue> findIssuesForDoctor(Doctor user){
+    public List<Issue> findIssuesForDoctor(Doctor user) {
         return issueRepository.findByDoctor(user);
     }
 
-    public List<Issue> findAllIssues(){
+    public List<Issue> findAllIssues() {
         return issueRepository.findAll();
     }
 
-    public List<Issue> findByKeyword(String keyword){
+    public List<Issue> findByKeyword(String keyword) {
         return issueRepository.findByPetNameLike("%" + keyword + "%");
     }
 
@@ -63,11 +63,11 @@ public class IssueService {
         Issue issue = new Issue();
         doctorRepository.findById(dto.getDoctor()).ifPresentOrElse(issue::setDoctor, () -> {
             log.error("Failed to create, doctor with id " + dto.getDoctor() + " not found");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to create pet issue");
+            throw new RuntimeException("Error while trying to create pet issue");
         });
         petRepository.findById(dto.getPet()).ifPresentOrElse(issue::setPet, () -> {
             log.error("Failed to create, pet with id " + dto.getPet() + " not found");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to create pet issue");
+            throw new RuntimeException("Error while trying to create pet issue");
         });
         issue.setDescription(dto.getDescription());
         issueRepository.save(issue);
@@ -87,7 +87,7 @@ public class IssueService {
             return issueRepository.save(issue1);
         }).orElseThrow(() -> {
             log.error("Failed to update, issue with id " + dto.getId() + " not found");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to modify pet issue");
+            throw new RuntimeException("Error while trying to modify pet issue");
         });
     }
 
@@ -97,7 +97,7 @@ public class IssueService {
             return issue.getId();
         }).orElseThrow(() -> {
             log.error("Failed to delete, issue with id " + id + " not found");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while trying to delete pet issue");
+            throw new RuntimeException("Error while trying to delete pet issue");
         });
     }
 
@@ -110,7 +110,7 @@ public class IssueService {
     }
 
     public Page<Issue> getLastPageForDoctor() {
-        Page<Issue> issuePage =  issueRepository.findAll(Pageable.ofSize(PageableUtils.DEFAULT_PAGE_SIZE));
+        Page<Issue> issuePage = issueRepository.findAll(Pageable.ofSize(PageableUtils.DEFAULT_PAGE_SIZE));
         int pageCount = issuePage.getTotalPages() - 1;
         return issueRepository.findAll(PageRequest.of(pageCount, PageableUtils.DEFAULT_PAGE_SIZE));
     }
