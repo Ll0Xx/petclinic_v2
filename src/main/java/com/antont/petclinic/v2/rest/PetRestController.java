@@ -3,6 +3,7 @@ package com.antont.petclinic.v2.rest;
 import com.antont.petclinic.v2.db.entity.Pet;
 import com.antont.petclinic.v2.dto.PetDto;
 import com.antont.petclinic.v2.service.PetService;
+import com.antont.petclinic.v2.service.utils.ServiceUtils;
 import com.antont.petclinic.v2.validation.ValidationResult;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -38,20 +39,15 @@ public class PetRestController {
     }
 
     @PostMapping(path = "/user/pet/create")
+    public ValidationResult create(@RequestBody @Valid PetDto dto, BindingResult bindingResult) {
+        return ServiceUtils.generateValidationResult(bindingResult, validationResult ->
+                validationResult.setResult(petService.create(dto)));
+    }
+
+    @PostMapping(path = "/user/pet/update")
     public ValidationResult update(@RequestBody @Valid PetDto dto, BindingResult bindingResult) {
-        try {
-            ValidationResult result = new ValidationResult();
-            if (bindingResult.hasErrors()) {
-                result.setSuccess(false);
-                result.setErrors(bindingResult.getAllErrors());
-            } else {
-                result.setSuccess(true);
-                result.setResult(petService.handlePetRequest(dto));
-            }
-            return result;
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+        return ServiceUtils.generateValidationResult(bindingResult, validationResult ->
+                validationResult.setResult(petService.update(dto)));
     }
 
     @DeleteMapping(path = "/user/pet/delete/{id}")

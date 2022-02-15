@@ -7,6 +7,16 @@
     <link rel="stylesheet" th:href="@{/assets/table.css} "/>
 <body>
 <header th:replace="_fragments.html :: header"></header>
+
+<form id="issue-search-form" class="col-10 mx-auto" method="post" th:action="@{/}">
+    <div class="input-group mb-3">
+        <input id="issue-search-keyword" type="search" class="form-control" aria-label="" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit">Search</button>
+        </div>
+    </div>
+</form>
+
 <div class="col-10 mx-auto" id="issuesTable">
     <div>
         <div id="issueListContainer" th:classappend="${issuesList.isEmpty()} ? 'd-none' : ''">

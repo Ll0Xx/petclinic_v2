@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -48,10 +46,10 @@ public class PetService {
     }
 
     public Pet handlePetRequest(PetDto dto) {
-        return dto.getId() == null ? savePet(dto) : editPet(dto);
+        return dto.getId() == null ? create(dto) : update(dto);
     }
 
-    private Pet savePet(PetDto dto) {
+    public Pet create(PetDto dto) {
         User user = userService.getLoggedInUser();
         Pet pet = new Pet();
         pet.setName(dto.getName());
@@ -73,7 +71,9 @@ public class PetService {
         });
     }
 
-    private Pet editPet(PetDto dto) {
+
+    
+    public Pet update(PetDto dto) {
         return findPetByIdForCurrentUser(dto.getId(), pet -> {
             pet.setName(dto.getName());
             pet.setPetType(getPetType(dto.getPetType()));

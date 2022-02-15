@@ -20,16 +20,17 @@ $('#issueModal').on('show.bs.modal', function (event) {
 });
 
 $(document).ready(function () {
-    loadContent('issue', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, loadContentSuccess)
+    loadContent('issue', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, DEFAULT_KEYWORD, loadContentSuccess)
     prepareTableHeaders('issue', ['id', 'doctor', 'doctorDoctorSpecialization', 'petName', 'description'], loadContentSuccess);
 
     const $form = $('#issueForm');
     $form.on('submit', function (e) {
         deleteErrorMessages()
         e.preventDefault();
+        const action = $("#issue-modal-id").length > 0   ? 'update' : 'create';
         try {
             $.ajax({
-                url: $form.attr('action'),
+                url: `${window.location}/issue/${action}`,
                 type: 'post',
                 contentType: 'application/json',
                 headers: {
@@ -57,6 +58,13 @@ $(document).ready(function () {
             console.error(e);
         }
     })
+
+    $("#issue-search-form").on('submit', function (e) {
+        deleteErrorMessages()
+        e.preventDefault();
+        const keyword =  $("#issue-search-keyword").val();
+        loadContent('issue', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, keyword, loadContentSuccess)
+    });
 })
 
 function loadLastPage(){
@@ -69,7 +77,9 @@ function loadLastPage(){
                 'X-CSRF-TOKEN': token
             },
             success: function (response) {
-                updatePagingControls(response, 'issue', loadContentSuccess)
+                updatePagingControls(response, 'issue' ).then(() => {
+                    loadContentSuccess('issue', response.content)
+                })
                 showTable()
             },
             error: function (response) {
@@ -165,7 +175,7 @@ function deleteIssue(id) {
                     'X-CSRF-TOKEN': token
                 },
                 success: function (response) {
-                    loadContent('issue', currentPage, DEFAULT_PAGE_SIZE, currentSortField, currentSortDir, loadContentSuccess)
+                    loadContent('issue', currentPage, DEFAULT_PAGE_SIZE, currentSortField, currentSortDir, currentKeyword, loadContentSuccess)
 
                 },
                 error: function (response) {

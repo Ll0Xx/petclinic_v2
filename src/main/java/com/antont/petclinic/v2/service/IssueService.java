@@ -13,9 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -55,11 +54,7 @@ public class IssueService {
         return issueRepository.findByPetNameLike("%" + keyword + "%");
     }
 
-    public Issue handleIssueRequest(IssueDto dto) {
-        return dto.getId() == null ? create(dto) : update(dto);
-    }
-
-    private Issue create(IssueDto dto) {
+    public Issue create(IssueDto dto) {
         Issue issue = new Issue();
         doctorRepository.findById(dto.getDoctor()).ifPresentOrElse(issue::setDoctor, () -> {
             log.error("Failed to create, doctor with id " + dto.getDoctor() + " not found");
@@ -74,7 +69,7 @@ public class IssueService {
         return issue;
     }
 
-    private Issue update(IssueDto dto) {
+    public Issue update(IssueDto dto) {
         Optional<Issue> issue = issueRepository.findById(dto.getId());
         return issue.map(issue1 -> {
             if (!issue1.getPet().getId().equals(dto.getPet())) {
@@ -105,13 +100,30 @@ public class IssueService {
         return issueRepository.findAllByPetOwner(userService.getLoggedInUser(), PageableUtils.getPageable(page, size, sort, direction));
     }
 
-    public Page<Issue> getPagedForDoctor(Optional<Integer> page, Optional<Integer> size, Optional<String> sort, Optional<String> direction) {
-        return issueRepository.findAll(PageableUtils.getPageable(page, size, sort, direction));
+    public Page<Issue> getPagedForDoctor(Optional<Integer> page, Optional<Integer> size, Optional<String> sort,
+                                         Optional<String> direction, Optional<String> keyword) {
+        return keyword.map(s -> issueRepository.findAll(getSpecification(s), PageableUtils.getPageable(page, size, sort, direction)))
+                .orElseGet(() -> issueRepository.findAll(PageableUtils.getPageable(page, size, sort, direction)));
     }
 
     public Page<Issue> getLastPageForDoctor() {
         Page<Issue> issuePage = issueRepository.findAll(Pageable.ofSize(PageableUtils.DEFAULT_PAGE_SIZE));
         int pageCount = issuePage.getTotalPages() - 1;
         return issueRepository.findAll(PageRequest.of(pageCount, PageableUtils.DEFAULT_PAGE_SIZE));
+    }
+
+    public static Specification<Issue> getSpecification(String keyword) {
+        return ((root, criteriaQuery, criteriaBuilder) -> {
+            criteriaQuery.distinct(true);
+            if (keyword == null) {
+                return null;
+            }
+            return criteriaBuilder.or(
+                    criteriaBuilder.like(root.get("doctor").get("user").get("email"), "%" + keyword + "%"),
+                    criteriaBuilder.like(root.get("doctor").get("doctorSpecialization").get("name"), "%" + keyword + "%"),
+                    criteriaBuilder.like(root.get("pet").get("name"), "%" + keyword + "%"),
+                    criteriaBuilder.like(root.get("description"), "%" + keyword + "%")
+            );
+        });
     }
 }

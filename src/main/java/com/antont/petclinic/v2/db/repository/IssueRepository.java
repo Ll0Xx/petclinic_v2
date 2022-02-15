@@ -6,11 +6,12 @@ import com.antont.petclinic.v2.db.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.math.BigInteger;
 import java.util.List;
 
-public interface IssueRepository extends JpaRepository<Issue, BigInteger> {
+public interface IssueRepository extends JpaRepository<Issue, BigInteger>, JpaSpecificationExecutor<Issue> {
     List<Issue> findByPetOwner(User owner);
 
     List<Issue> findByDoctor(Doctor doctor);

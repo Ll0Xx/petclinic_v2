@@ -10,4 +10,6 @@ $(document).ready(function () {
         e.preventDefault()
         $(this).tab('show')
     })
+
+    currentSortField = DEFAULT_SORT_FIELD;
 });

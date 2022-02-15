@@ -1,6 +1,7 @@
 //= require common/common.js
 
 $('#petModal').on('show.bs.modal', function (event) {
+    deleteErrorMessages()
     const id = event.relatedTarget.getAttribute('data-bs-id');
     const name = event.relatedTarget.getAttribute('data-bs-name');
     $('#pet-modal-name').val(name);
@@ -18,8 +19,8 @@ $('#petModal').on('show.bs.modal', function (event) {
 });
 
 $(document).ready(function () {
-    loadContent('pet', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, loadContentSuccess);
-    loadContent('issue', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, loadContentSuccess);
+    loadContent('pet', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, currentKeyword, loadContentSuccess);
+    loadContent('issue', DEFAULT_START_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_FIELD, DEFAULT_DIRECTION, currentKeyword, loadContentSuccess);
 
     prepareTableHeaders('pet', ['id', 'name', 'petType'], loadContentSuccess);
     prepareTableHeaders('issue', ['id', 'doctor', 'doctorDoctorSpecialization', 'petName', 'description'], loadContentSuccess);
@@ -28,9 +29,10 @@ $(document).ready(function () {
     $form.on('submit', function (e) {
         e.preventDefault();
         deleteErrorMessages();
+        const action = $("#pet-modal-id").length > 0   ? 'update' : 'create';
         try {
             $.ajax({
-                url: $form.attr('action'),
+                url: `${window.location}/pet/${action}`,
                 contentType: 'application/json',
                 type: 'post',
                 headers: {
@@ -60,6 +62,10 @@ $(document).ready(function () {
             console.error(e);
         }
     })
+
+    $('a[data-mdb-toggle="tab"]').on('shown.bs.tab', function (e) {
+       currentSortField = DEFAULT_SORT_FIELD;
+    });
 })
 
 function loadContentSuccess(table, items){
@@ -82,7 +88,9 @@ function loadLastPage(){
                 'X-CSRF-TOKEN': token
             },
             success: function (response) {
-                updatePagingControls(response, 'pet', loadContentSuccess)
+                updatePagingControls(response, 'pet', ).then(() => {
+                    loadContentSuccess('pet', response.content)
+                })
                 showTable()
             },
             error: function (response) {
@@ -157,7 +165,8 @@ function createErrorFields(response) {
 }
 
 function deleteErrorMessages(){
-    $(`.pet-modal-message`).remove();
+    $(".is-invalid").removeClass("is-invalid");
+    $('.pet-modal-message').remove();
 }
 
 function deletePet(id) {

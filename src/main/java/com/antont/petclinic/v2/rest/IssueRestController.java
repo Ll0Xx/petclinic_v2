@@ -5,6 +5,7 @@ import com.antont.petclinic.v2.db.entity.Pet;
 import com.antont.petclinic.v2.dto.IssueDto;
 import com.antont.petclinic.v2.service.IssueService;
 import com.antont.petclinic.v2.service.PetService;
+import com.antont.petclinic.v2.service.utils.ServiceUtils;
 import com.antont.petclinic.v2.validation.ValidationResult;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -19,12 +20,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class IssueController {
+public class IssueRestController {
 
     private final IssueService issueService;
     private final PetService petService;
 
-    public IssueController(IssueService issueService, PetService petService) {
+    public IssueRestController(IssueService issueService, PetService petService) {
         this.issueService = issueService;
         this.petService = petService;
     }
@@ -41,8 +42,9 @@ public class IssueController {
     public Page<Issue> getPagedIssuesForDoctor(@RequestParam("page") Optional<Integer> page,
                                                @RequestParam("size") Optional<Integer> size,
                                                @RequestParam("sort") Optional<String> sort,
-                                               @RequestParam("dir") Optional<String> direction) {
-        return issueService.getPagedForDoctor(page, size, sort, direction);
+                                               @RequestParam("dir") Optional<String> direction,
+                                               @RequestParam("keyword") Optional<String> keyword) {
+        return issueService.getPagedForDoctor(page, size, sort, direction, keyword);
     }
 
     @GetMapping(path = "/doctor/issue/last")
@@ -51,20 +53,15 @@ public class IssueController {
     }
 
     @PostMapping(path = "/doctor/issue/create")
+    public ValidationResult create(@Valid @RequestBody IssueDto dto, BindingResult bindingResult) {
+        return ServiceUtils.generateValidationResult(bindingResult, validationResult ->
+                validationResult.setResult(issueService.create(dto)));
+    }
+
+    @PostMapping(path = "/doctor/issue/update")
     public ValidationResult update(@Valid @RequestBody IssueDto dto, BindingResult bindingResult) {
-        try {
-            ValidationResult result = new ValidationResult();
-            if (bindingResult.hasErrors()) {
-                result.setSuccess(false);
-                result.setErrors(bindingResult.getAllErrors());
-            } else {
-                result.setSuccess(true);
-                result.setResult(issueService.handleIssueRequest(dto));
-            }
-            return result;
-        } catch (RuntimeException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+        return ServiceUtils.generateValidationResult(bindingResult, validationResult ->
+                validationResult.setResult(issueService.update(dto)));
     }
 
     @DeleteMapping(path = "/doctor/issue/delete/{id}")

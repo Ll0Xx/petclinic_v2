@@ -7,6 +7,10 @@ $(document).ready(function (){
         $("#login-error-message").removeClass("d-none");
         $("#login-email").addClass('is-invalid');
         $("#login-password").addClass('is-invalid');
+    } else{
+        $(".sign-up-error-message").removeClass("d-none");
+        $("#login-error-message").addClass("d-none");
+        $(".is-invalid").removeClass("is-invalid");
     }
 
     const $checkbox = $('#isDoctor');
@@ -80,7 +84,9 @@ $(document).ready(function (){
     }
 
     function deleteErrorMessages(){
+        $("#login-error-message").addClass("d-none");
         $(`.sign-up-error-message`).remove();
+        $(".is-invalid").removeClass("is-invalid");
         console.log('Delete all error messages');
     }
 })
