@@ -102,8 +102,7 @@ public class IssueService {
 
     public Page<Issue> getPagedForDoctor(Optional<Integer> page, Optional<Integer> size, Optional<String> sort,
                                          Optional<String> direction, Optional<String> keyword) {
-        return keyword.map(s -> issueRepository.findAll(getSpecification(s), PageableUtils.getPageable(page, size, sort, direction)))
-                .orElseGet(() -> issueRepository.findAll(PageableUtils.getPageable(page, size, sort, direction)));
+        return issueRepository.findAll(getSpecification(keyword.get()), PageableUtils.getPageable(page, size, sort, direction));
     }
 
     public Page<Issue> getLastPageForDoctor() {
